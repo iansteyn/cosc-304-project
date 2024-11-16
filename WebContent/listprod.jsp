@@ -18,12 +18,19 @@
         (Leave blank for all products)
     </form>
 
+    <%-- GET SEARCH TERM & SET TABLE HEADING --%>
     <%
         String searchTerm = request.getParameter("productSearch");
-        String resultsHeading = (searchTerm == "" || searchTerm == null) ? ("All Products") : ("Products containing '" + searchTerm + "'");
+        String tableHeading;
+
+        if (searchTerm == "" || searchTerm == null) {
+            tableHeading = "All Products";
+        } else {
+            tableHeading = String.format("Products containing '%s'", searchTerm);
+        }
     %>
 
-    <h2><%= resultsHeading %></h2>
+    <h2><%= tableHeading %></h2>
 
     <table>
         <tr>
@@ -32,25 +39,24 @@
             <th>Price</th>
         </tr>
 
-
+        <%-- QUERY DB & LIST PRODUCTS IN TABLE --%>
         <%
-            //Ian: Is this really neccessary? Lecture 12 Slide 8 seems to say it isn't
-            //Note: Forces loading of SQL Server driver
+            // Load driver class
             try {
-                // Load driver class
                 Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             }
             catch (java.lang.ClassNotFoundException e) {
                 out.println("ClassNotFoundException: " + e);
             }
 
-            // Make the connection
+            // Connection info
             String url = "jdbc:sqlserver://cosc304_sqlserver:1433;DatabaseName=orders;TrustServerCertificate=True";		
             String uid = "sa";
             String pw = "304#sa#pw";
 
             String query = "SELECT productId, productName, productPrice FROM product WHERE productName LIKE '%' + ? + '%'";
 
+            // Make connection to DB
             try(Connection con = DriverManager.getConnection(url, uid, pw);
                 PreparedStatement preparedStatement = con.prepareStatement(query);)
             {
@@ -58,10 +64,10 @@
                 preparedStatement.setString(1, searchTerm);
                 ResultSet resultSet = preparedStatement.executeQuery();
 
-                // Print out the ResultSet
-                NumberFormat currencyFormattter = NumberFormat.getCurrencyInstance();
+                NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
 
-                while(resultSet.next())
+                // Process query results
+                while (resultSet.next())
                 {
                     int productId = resultSet.getInt("productId");
                     String productName = resultSet.getString("productName");
@@ -74,16 +80,19 @@
                         productPrice
                     );
 
-                    String formattedPrice = currencyFormattter.format(productPrice);
+                    String formattedPrice = currencyFormatter.format(productPrice);
 
-                    out.println(String.format(
+                    String tableRow = String.format(
                         "<tr> <td>%s</td> <td>%s</td> <td>%s</td> </tr>",
                         link,
                         productName,
                         formattedPrice
-                    ));
+                    );
+
+                    out.println(tableRow);
                 }
             }
+            // Note: Connection is closed implicitly
             catch (SQLException e)
             {
                 out.println("SQLException: " + e);
