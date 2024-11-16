@@ -5,7 +5,7 @@
 <html>
 
 <head>
-    <title>Cube Shop BC</title>
+    <title>Rowan & Ian's Grocery</title>
 </head>
 
 <body>
@@ -13,16 +13,18 @@
 
     <form method="get" action="listprod.jsp">
         <input type="text" name="productSearch" size="50">
+        <!-- uhh... submit and reset buttons don't do anything?
+        They don't even work properly on Ray's website?-->
         <input type="submit" value="Submit"><input type="reset" value="Reset"> (Leave blank for all products)
     </form>
 
     <%
-        // Get product name to search for
         String searchTerm = request.getParameter("productSearch");
+        String resultsHeading = (searchTerm == "" || searchTerm == null) ? ("All Products") : ("Products containing '" + searchTerm + "'");
     %>
 
     <h2>
-        <%= (searchTerm == "" || searchTerm == null) ? ("All Products") : ("Products containing '" + searchTerm + "'") %>
+        <%= resultsHeading %>
     </h2>
 
     <%
@@ -36,15 +38,13 @@
             out.println("ClassNotFoundException: " + e);
         }
 
-        // Variable searchTerm now contains the search string the user entered
-        // Use it to build a query and print out the resultset.  Make sure to use PreparedStatement!
-
         // Make the connection
-        String url = "jdbc:sqlserver://localhost;databaseName=order;TrustServerCertificate=True";		
-		String uid = "sa";
-		String pw = "todo"; //TODO - is this correct?
+        //TODO something must still be wrong here because no products are showing up
+        String url = "jdbc:sqlserver://localhost;databaseName=orders;TrustServerCertificate=True";		
+        String uid = "304#sa";
+        String pw = "304#sa#pw";
 
-        String query = "SELECT * FROM product WHERE productName LIKE '%?%'";
+        String query = "SELECT productId, productName, productPrice FROM product WHERE productName LIKE '%?%'";
 
         try(Connection con = DriverManager.getConnection(url, uid, pw);
             PreparedStatement preparedStatement = con.prepareStatement(query);
@@ -68,7 +68,7 @@
                     productPrice
                 );
 
-                out.println(productName + " " + productPrice);
+                out.println(link + " " + productName + " " + productPrice);
             }
         }
         catch (SQLException e)
