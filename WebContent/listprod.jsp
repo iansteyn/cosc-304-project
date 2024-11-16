@@ -39,12 +39,11 @@
         }
 
         // Make the connection
-        //TODO something must still be wrong here because no products are showing up
-        String url = "jdbc:sqlserver://localhost;databaseName=orders;TrustServerCertificate=True";		
-        String uid = "304#sa";
+        String url = "jdbc:sqlserver://cosc304_sqlserver:1433;DatabaseName=orders;TrustServerCertificate=True";		
+        String uid = "sa";
         String pw = "304#sa#pw";
 
-        String query = "SELECT productId, productName, productPrice FROM product WHERE productName LIKE '%?%'";
+        String query = "SELECT productId, productName, productPrice FROM product WHERE productName LIKE '%' + ? + '%'";
 
         try(Connection con = DriverManager.getConnection(url, uid, pw);
             PreparedStatement preparedStatement = con.prepareStatement(query);
@@ -73,7 +72,7 @@
         }
         catch (SQLException e)
         {
-            System.err.println("SQLException: " + e);
+            out.println("SQLException: " + e);
         }
         //Note: connection is closed implicitly by try-catch
 
