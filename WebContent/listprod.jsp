@@ -3,46 +3,107 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF8"%>
 <!DOCTYPE html>
 <html>
+
 <head>
-<title>YOUR NAME Grocery</title>
+    <title>Rowan & Ian's Grocery</title>
 </head>
+
 <body>
+    <h1>Search for the products you want to buy:</h1>
 
-<h1>Search for the products you want to buy:</h1>
+    <form method="get" action="listprod.jsp">
+        <input type="text" name="productSearch" size="50">
+        <input type="submit" value="Submit">
+        <input type="reset" value="Reset">
+        (Leave blank for all products)
+    </form>
 
-<form method="get" action="listprod.jsp">
-<input type="text" name="productName" size="50">
-<input type="submit" value="Submit"><input type="reset" value="Reset"> (Leave blank for all products)
-</form>
+    <%-- GET SEARCH TERM & SET TABLE HEADING --%>
+    <%
+        String searchTerm = request.getParameter("productSearch");
 
-<% // Get product name to search for
-String name = request.getParameter("productName");
-		
-//Note: Forces loading of SQL Server driver
-try
-{	// Load driver class
-	Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-}
-catch (java.lang.ClassNotFoundException e)
-{
-	out.println("ClassNotFoundException: " +e);
-}
+        if (searchTerm == null) {
+            searchTerm = ""; //done so that all products are displayed by default
+        }
 
-// Variable name now contains the search string the user entered
-// Use it to build a query and print out the resultset.  Make sure to use PreparedStatement!
+        String tableHeading;
 
-// Make the connection
+        if (searchTerm.equals("")) {
+            tableHeading = "All Products";
+        } else {
+            tableHeading = String.format("Products containing '%s'", searchTerm);
+        }
+    %>
 
-// Print out the ResultSet
+    <h2><%= tableHeading %></h2>
 
-// For each product create a link of the form
-// addcart.jsp?id=productId&name=productName&price=productPrice
-// Close connection
+    <table>
+        <tr>
+            <th></th>
+            <th>Product Name</th>
+            <th>Price</th>
+        </tr>
 
-// Useful code for formatting currency values:
-// NumberFormat currFormat = NumberFormat.getCurrencyInstance();
-// out.println(currFormat.format(5.0);	// Prints $5.00
-%>
+        <%-- QUERY DB & LIST PRODUCTS IN TABLE --%>
+        <%
+            // Load driver class
+            try {
+                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            }
+            catch (java.lang.ClassNotFoundException e) {
+                out.println("ClassNotFoundException: " + e);
+            }
+
+            // Connection info
+            String url = "jdbc:sqlserver://cosc304_sqlserver:1433;DatabaseName=orders;TrustServerCertificate=True";		
+            String uid = "sa";
+            String pw = "304#sa#pw";
+
+            String query = "SELECT productId, productName, productPrice FROM product WHERE productName LIKE '%' + ? + '%'";
+
+            // Make connection to DB
+            try(Connection con = DriverManager.getConnection(url, uid, pw);
+                PreparedStatement preparedStatement = con.prepareStatement(query);)
+            {
+                //do the query
+                preparedStatement.setString(1, searchTerm);
+                ResultSet resultSet = preparedStatement.executeQuery();
+
+                NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
+
+                // Process query results row by row
+                while (resultSet.next())
+                {
+                    int productId = resultSet.getInt("productId");
+                    String productName = resultSet.getString("productName");
+                    double productPrice = resultSet.getDouble("productPrice");
+
+                    String addToCartLink = String.format(
+                        "<a href=\"addcart.jsp?id=%d&name=%s&price=%f\">Add to cart</a>",
+                        productId,
+                        productName,
+                        productPrice
+                    );
+
+                    String formattedPrice = currencyFormatter.format(productPrice);
+
+                    String tableRow = String.format(
+                        "<tr> <td>%s</td> <td>%s</td> <td>%s</td> </tr>",
+                        addToCartLink,
+                        productName,
+                        formattedPrice
+                    );
+
+                    out.println(tableRow);
+                }
+            }
+            // Note: Connection is closed implicitly
+            catch (SQLException e)
+            {
+                out.println("SQLException: " + e);
+            }
+        %>
+    </table>
 
 </body>
 </html>
