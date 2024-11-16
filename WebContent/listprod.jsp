@@ -20,6 +20,7 @@
         // Get product name to search for
         String productName = request.getParameter("productName");
 
+        //Ian: Is this really neccessary? Lecture 12 Slide 8 seems to say it isn't
         //Note: Forces loading of SQL Server driver
         try { // Load driver class
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
@@ -35,21 +36,31 @@
         String url = "jdbc:mysql://localhost/orders";
         String uid = "user"; // TODO - is this correct?
         String pw = "testpw";//TODO - is this correct?
+
+        String query = """
+            SELECT *
+            FROM product
+            WHERE productName LIKE '%?%'
+        """;
+
         try (Connection con = DriverManager.getConnection(url, uid, pw);
-            PreparedStatement prepared_statement = con.prepareStatement(query);)
+             PreparedStatement preparedStatement = con.prepareStatement(query);)
         {
-            //TODO - some stuff
+            preparedStatement.setString(1,productName);
+            ResultSet resultSet = preparedStatement.executeQuery();
         }
         catch (SQLException e) {
             System.out.println(e);
         }
 
-
         // Print out the ResultSet
+        
 
         // For each product create a link of the form
         // addcart.jsp?id=productId&name=productName&price=productPrice
-        // Close connection
+
+        // Close connection - should already be done by the try catch; we shall see
+        // con.close();
 
         // Useful code for formatting currency values:
         // NumberFormat currFormat = NumberFormat.getCurrencyInstance();
