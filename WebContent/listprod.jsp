@@ -21,9 +21,14 @@
     <%-- GET SEARCH TERM & SET TABLE HEADING --%>
     <%
         String searchTerm = request.getParameter("productSearch");
+
+        if (searchTerm == null) {
+            searchTerm = ""; //done so that all products are displayed by default
+        }
+
         String tableHeading;
 
-        if (searchTerm == "" || searchTerm == null) {
+        if (searchTerm.equals("")) {
             tableHeading = "All Products";
         } else {
             tableHeading = String.format("Products containing '%s'", searchTerm);
@@ -66,14 +71,14 @@
 
                 NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
 
-                // Process query results
+                // Process query results row by row
                 while (resultSet.next())
                 {
                     int productId = resultSet.getInt("productId");
                     String productName = resultSet.getString("productName");
                     double productPrice = resultSet.getDouble("productPrice");
 
-                    String link = String.format(
+                    String addToCartLink = String.format(
                         "<a href=\"addcart.jsp?id=%d&name=%s&price=%f\">Add to cart</a>",
                         productId,
                         productName,
@@ -84,7 +89,7 @@
 
                     String tableRow = String.format(
                         "<tr> <td>%s</td> <td>%s</td> <td>%s</td> </tr>",
-                        link,
+                        addToCartLink,
                         productName,
                         formattedPrice
                     );
