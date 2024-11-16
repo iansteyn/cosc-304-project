@@ -24,21 +24,25 @@
         // Determine if there are products in the shopping cart
         // If either are not true, display an error message
 
+
         // Make connection
         getConnection(); //from jdbc.jsp?
 
         // Save order information to database
-        {
-            String insertSQL = "INSERT INTO orderSummary(customerId, orderDate, totalAmount) VALUES(?, ?, ?)";
+        String insertSQL = "INSERT INTO orderSummary(customerId, orderDate) VALUES(?, ?)";
 
-            // Use retrieval of auto-generated keys.
-            PreparedStatement pstmt = con.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);			
-            ResultSet keys = pstmt.getGeneratedKeys();
-            keys.next();
-            int orderId = keys.getInt(1);
-        }
+        PreparedStatement pstmt = con.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);			
+        pstmt.setInt(1, customerId);
+        pstmt.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+
+        pstmt.executeUpdate();
 
         // Insert each item into OrderProduct table using OrderId from previous INSERT
+        ResultSet keys = pstmt.getGeneratedKeys();
+        keys.next();
+        int orderId = keys.getInt(1);
+
+        //String insertSQL =  
 
         // Update total amount for order record
 
