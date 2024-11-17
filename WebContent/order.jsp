@@ -29,13 +29,16 @@
 
         // VALIDATION
         // ----------
-        // find boolean customerIdIsValid
-        String queryForCustomerId = "SELECT customerId FROM customer WHERE customerId = ?";
+        // find boolean customerIdIsValid, also use this resultset for customer name later (if data is validated here)
+        //TODO - rename pstmts more sensibly
+        String queryForCustomerId = "SELECT firstName, lastName FROM customer WHERE customerId = ?";
         PreparedStatement pstmt1 = con.prepareStatement(queryForCustomerId);
         pstmt1.setInt(1, customerId);
-        ResultSet resultSet = pstmt1.executeQuery();
+        ResultSet customerResultSet = pstmt1.executeQuery();
 
-        boolean customerIdIsValid = resultSet.isBeforeFirst();
+        boolean customerIdIsValid = customerResultSet.isBeforeFirst();
+
+        //Note: do not close this pstmt yet, because we may need the resultSet later for customer name
 
         // Determine if customer id is valid
         if (!customerIdIsValid) {
@@ -64,9 +67,7 @@
             ResultSet keys = pstmt.getGeneratedKeys();
             keys.next();
             int orderId = keys.getInt(1);
-
             pstmt.close();
-            keys.close();
 
             //Prep - prepare a new insert statement
             String insertSQL2 = "INSERT INTO OrderProduct(OrderId, ProductId, quantity, price) VALUES(?, ?, ?, ?)";
@@ -143,9 +144,10 @@
                 currencyFormatter.format(orderTotal)
             );
             out.println(finalRow);
+            out.println("</table>");
 
             //Update total amount for order record
-            String updateSQL = "UPDATE orderSummary SET totalAmount = (?) WHERE orderId = ?";
+            String updateSQL = "UPDATE orderSummary SET totalAmount = ? WHERE orderId = ?";
             PreparedStatement pstmt3 = con.prepareStatement(updateSQL);
             pstmt3.setDouble(1, orderTotal);
             pstmt3.setInt(2, orderId);
@@ -153,16 +155,30 @@
             pstmt3.close();
 
             // FINAL STUFF
-            // query customer id , sheesh this file is getting long
+            // get customer name
+            customerResultSet.next();
+            String customerName = customerResultSet.getString("firstName") + " " + customerResultSet.getString("lastName");
+
             // print success message
+            String successMessage = String.format(
+                "<h1>Order Completed. Will be shipped soon...</h1>"
+                +"<h2>Your order reference number is: %d</h2>"
+                +"<h2>Shipping to customer: %d. Name: %s",
+                orderId,
+                customerId,
+                customerName
+            );
+
+            out.println(successMessage);
 
             // Clear cart if order placed successfully
 
-            out.println("</table>");
+            
         }
 
         
         //close db connection
+        customerResultSet.close(); //dunno if this is neccessary but it seems like good practice
         closeConnection(); // from jdbc.jsp
     %>
 </body>
