@@ -44,6 +44,7 @@
         }
 
         // Connect to DB and validate customer id (PT 2),
+        getConnection();
         PreparedStatement pstmt1 = con.prepareStatement(
             "SELECT firstName, lastName FROM customer WHERE customerId = ?"
         );
