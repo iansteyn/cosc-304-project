@@ -74,7 +74,7 @@
             //html prep - for some reason multiline strings are not a thing for JSP
             out.println(
                 "<h1>Your Order Summary</h1>"
-                +"<table>"
+                +"<table style='text-align: center'>"
                 +   "<tr>"
                 +       "<th>Product Id</th>"
                 +       "<th>Product Name</th>"
@@ -83,6 +83,10 @@
                 +       "<th>Subtotal</th>"
                 +   "</tr>"
             );
+
+            //prep - initialize orderTotal variable, get currency formatter
+            double orderTotal = 0;
+            NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
             
             //For each item in productList:
                 // - insert it into OrderProduct table, using the orderId
@@ -97,6 +101,7 @@
                 ArrayList<Object> product = (ArrayList<Object>) entry.getValue();
 
                 String productIdString = (String) product.get(0); 
+                String productName = (String) product.get(1);
                 String priceString = (String) product.get(2); //TODO - I think price should be 3 and qty should be 2 based on the thing above... but I'm not sure
                 
                 int productId = Integer.parseInt(productIdString);
@@ -109,13 +114,26 @@
                 pstmt2.setDouble(4, price);
                 pstmt2.executeUpdate();
 
-                //TODO - calculate subtotal
+                //Calculate subtotal
+                double subtotal = quantity * price;
+                orderTotal += subtotal;
 
-                //TODO - print row
+                //Print row
+                String tableRow = String.format(
+                    "<tr> <td>%d</td> <td>%s</td> <td>%d</td> <td>%s</td> <td>%s</td> </tr>",
+                    productId,
+                    productName,
+                    quantity,
+                    currencyFormatter.format(price),
+                    currencyFormatter.format(subtotal)
+                );
+
+                out.println(tableRow);
             }
 
             pstmt2.close();
 
+            //TODO: print orderTotal
             // Update total amount for order record
             String updateSQLstart = "UPDATE orderSummary SET totalAmount = (";
             String updateSQLsubquery = "SELECT SUM(quantity * price) FROM orderProduct WHERE orderId = ?";
