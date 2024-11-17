@@ -47,9 +47,10 @@
             out.println("<h1>Shopping cart is empty!<h1>");
             out.println("<h2><a href=\"listprod.jsp\">Return to shopping.</a></h2>");
         }
-        // SAVE ORDER TO DB & PRINT SUMMARY
+        // A BUNCH OF STUFFFFFFFFFFFFF
         // --------------------------------
         else {
+            // SAVE INFO TO ORDERSUMMARY
             // Save customerid and orderdate information to database
             String insertSQL = "INSERT INTO orderSummary(customerId, orderDate) VALUES(?, ?)";
 
@@ -58,6 +59,7 @@
             pstmt.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
             pstmt.executeUpdate();
 
+            //PREPARE TO SAVE AND PRINT PRODUCTLIST INFO
             // Prep - Get orderId generated from previous INSERT
             ResultSet keys = pstmt.getGeneratedKeys();
             keys.next();
@@ -88,14 +90,15 @@
             double orderTotal = 0;
             NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
             
+            //SAVE AND PRINT PRODUCT LIST INFO
             //For each item in productList:
                 // - insert it into OrderProduct table, using the orderId
                 // - calculate its subtotal to the order total
                 // - print out (or at least save) a summary line
                 // Each entry in the HashMap is an ArrayList with item 0-id, 1-name, 2-quantity, 3-price
             Iterator<Map.Entry<String, ArrayList<Object>>> iterator = productList.entrySet().iterator();
-            while (iterator.hasNext())
-            {
+            while (iterator.hasNext()) {
+            
                 //Get item info from productList hashmap
                 Map.Entry<String, ArrayList<Object>> entry = iterator.next();
                 ArrayList<Object> product = (ArrayList<Object>) entry.getValue();
@@ -133,7 +136,14 @@
 
             pstmt2.close();
 
-            //TODO: print orderTotal
+            // ORDER TOTAL STUFF
+            //print orderTotal
+            String finalRow = String.format(
+                "<tr> <td></td> <td></td> <td></td> <th>Order Total</th> <td>%s</tr>",
+                currencyFormatter.format(orderTotal)
+            );
+            out.println(finalRow);
+
             // Update total amount for order record
             String updateSQLstart = "UPDATE orderSummary SET totalAmount = (";
             String updateSQLsubquery = "SELECT SUM(quantity * price) FROM orderProduct WHERE orderId = ?";
@@ -147,7 +157,9 @@
             pstmt3.executeUpdate();
             pstmt3.close();
 
-            // Print out order summary
+            // FINAL STUFF
+            // query customer id , sheesh this file is getting long
+            // print success message
 
             // Clear cart if order placed successfully
 
