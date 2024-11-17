@@ -93,8 +93,17 @@
             pstmt2.close();
 
             // Update total amount for order record
+            String updateSQLstart = "UPDATE orderSummary SET totalAmount = ("
+            String updateSQLsubquery = "SELECT SUM(quantity * price) AS orderTotal FROM OrderedProduct WHERE OrderId = ?";
+            String updateSQLend = ") WHERE orderId = ?";
 
-            
+            String updateSQL = updateSQLstart + updateSQLsubquery + updateSQLend;
+
+            PreparedStatement pstmt3 = con.prepareStatement(updateSQL);
+            pstmt3.setInt(1, orderId);
+            pstmt3.setInt(1, orderId);
+            pstmt3.executeUpdate();
+            pstmt3.close();
 
             // Print out order summary
 
