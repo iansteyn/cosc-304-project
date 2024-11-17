@@ -58,7 +58,7 @@
             pstmt.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
             pstmt.executeUpdate();
 
-            // Get orderId generated from previous INSERT
+            // Prep - Get orderId generated from previous INSERT
             ResultSet keys = pstmt.getGeneratedKeys();
             keys.next();
             int orderId = keys.getInt(1);
@@ -66,16 +66,33 @@
             pstmt.close();
             keys.close();
 
-            //prepare a new insert statement
+            //Prep - prepare a new insert statement
             String insertSQL2 = "INSERT INTO OrderProduct(OrderId, ProductId, quantity, price) VALUES(?, ?, ?, ?)";
             PreparedStatement pstmt2 = con.prepareStatement(insertSQL2);
             pstmt2.setInt(1, orderId);
 
-            //Insert each item from productList into OrderProduct table, using this orderId
+            //html prep - for some reason multiline strings are not a thing for JSP
+            out.println(
+                "<h1>Your Order Summary</h1>"
+                +"<table>"
+                +   "<tr>"
+                +       "<th>Product Id</th>"
+                +       "<th>Product Name</th>"
+                +       "<th>Quantity</th>"
+                +       "<th>Price</th>"
+                +       "<th>Subtotal</th>"
+                +   "</tr>"
+            );
+            
+            //For each item in productList:
+                // - insert it into OrderProduct table, using the orderId
+                // - calculate its subtotal to the order total
+                // - print out (or at least save) a summary line
                 // Each entry in the HashMap is an ArrayList with item 0-id, 1-name, 2-quantity, 3-price
             Iterator<Map.Entry<String, ArrayList<Object>>> iterator = productList.entrySet().iterator();
             while (iterator.hasNext())
             {
+                //Get item info from productList hashmap
                 Map.Entry<String, ArrayList<Object>> entry = iterator.next();
                 ArrayList<Object> product = (ArrayList<Object>) entry.getValue();
 
@@ -86,10 +103,15 @@
                 double price = Double.parseDouble(priceString); //lol what why this way
                 int quantity = ((Integer) product.get(3)).intValue(); 
 
+                // Insert item record into OrderProduct table
                 pstmt2.setInt(2, productId);
                 pstmt2.setInt(3, quantity);
                 pstmt2.setDouble(4, price);
                 pstmt2.executeUpdate();
+
+                //TODO - calculate subtotal
+
+                //TODO - print row
             }
 
             pstmt2.close();
@@ -97,7 +119,7 @@
             // Update total amount for order record
             String updateSQLstart = "UPDATE orderSummary SET totalAmount = (";
             String updateSQLsubquery = "SELECT SUM(quantity * price) FROM orderProduct WHERE orderId = ?";
-            String updateSQLend = ") WHERE orderId = ?";
+            String updateSQLend = ") WHERE orderId = ?"; //Okay wait I could calculate the orderTotal on this end
 
             String updateSQL = updateSQLstart + updateSQLsubquery + updateSQLend;
 
@@ -110,8 +132,11 @@
             // Print out order summary
 
             // Clear cart if order placed successfully
+
+            out.println("</table>");
         }
 
+        
         //close db connection
         closeConnection(); // from jdbc.jsp
     %>
