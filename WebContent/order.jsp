@@ -43,7 +43,7 @@
             out.println("<h2><a href=\"checkout.jsp\">Try again.</a></h2>");
         }
         // Determine if there are products in the shopping cart
-        else if (productList.isEmpty()) {
+        else if (productList.isEmpty()) { //TODO: this line causes an error when shop page is loaded on its on
             out.println("<h1>Shopping cart is empty!<h1>");
             out.println("<h2><a href=\"listprod.jsp\">Return to shopping.</a></h2>");
         }
@@ -79,10 +79,12 @@
                 Map.Entry<String, ArrayList<Object>> entry = iterator.next();
                 ArrayList<Object> product = (ArrayList<Object>) entry.getValue();
 
-                String productId = (String) product.get(0);
+                String productIdString = (String) product.get(0); 
                 String priceString = (String) product.get(2); //TODO - I think price should be 3 and qty should be 2 based on the thing above... but I'm not sure
-                double price = Double.parseDouble(priceString);
-                int quantity = ((Integer) product.get(3)).intValue(); //lol what why this way
+                
+                int productId = Integer.parseInt(productIdString);
+                double price = Double.parseDouble(priceString); //lol what why this way
+                int quantity = ((Integer) product.get(3)).intValue(); 
 
                 pstmt2.setInt(2, productId);
                 pstmt2.setInt(3, quantity);
@@ -93,15 +95,15 @@
             pstmt2.close();
 
             // Update total amount for order record
-            String updateSQLstart = "UPDATE orderSummary SET totalAmount = ("
-            String updateSQLsubquery = "SELECT SUM(quantity * price) AS orderTotal FROM OrderedProduct WHERE OrderId = ?";
+            String updateSQLstart = "UPDATE orderSummary SET totalAmount = (";
+            String updateSQLsubquery = "SELECT SUM(quantity * price) FROM orderProduct WHERE orderId = ?";
             String updateSQLend = ") WHERE orderId = ?";
 
             String updateSQL = updateSQLstart + updateSQLsubquery + updateSQLend;
 
             PreparedStatement pstmt3 = con.prepareStatement(updateSQL);
             pstmt3.setInt(1, orderId);
-            pstmt3.setInt(1, orderId);
+            pstmt3.setInt(2, orderId);
             pstmt3.executeUpdate();
             pstmt3.close();
 
@@ -111,7 +113,7 @@
         }
 
         //close db connection
-        closeConnection();
+        closeConnection(); // from jdbc.jsp
     %>
 </body>
 </html>
