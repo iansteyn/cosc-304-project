@@ -94,8 +94,8 @@
             //For each item in productList:
                 // - insert it into OrderProduct table, using the orderId
                 // - calculate its subtotal to the order total
-                // - print out (or at least save) a summary line
-                // Each entry in the HashMap is an ArrayList with item 0-id, 1-name, 2-quantity, 3-price
+                // - print out its row in the table
+                // Each entry in the HashMap is an ArrayList with item 0-id, 1-name, 2-price, 3-quantity
             Iterator<Map.Entry<String, ArrayList<Object>>> iterator = productList.entrySet().iterator();
             while (iterator.hasNext()) {
             
@@ -105,11 +105,11 @@
 
                 String productIdString = (String) product.get(0); 
                 String productName = (String) product.get(1);
-                String priceString = (String) product.get(2); //TODO - I think price should be 3 and qty should be 2 based on the thing above... but I'm not sure
-                
-                int productId = Integer.parseInt(productIdString);
-                double price = Double.parseDouble(priceString); //lol what why this way
+                String priceString = (String) product.get(2);
                 int quantity = ((Integer) product.get(3)).intValue(); 
+
+                int productId = Integer.parseInt(productIdString);
+                double price = Double.parseDouble(priceString);
 
                 // Insert item record into OrderProduct table
                 pstmt2.setInt(2, productId);
@@ -144,15 +144,10 @@
             );
             out.println(finalRow);
 
-            // Update total amount for order record
-            String updateSQLstart = "UPDATE orderSummary SET totalAmount = (";
-            String updateSQLsubquery = "SELECT SUM(quantity * price) FROM orderProduct WHERE orderId = ?";
-            String updateSQLend = ") WHERE orderId = ?"; //Okay wait I could calculate the orderTotal on this end
-
-            String updateSQL = updateSQLstart + updateSQLsubquery + updateSQLend;
-
+            //Update total amount for order record
+            String updateSQL = "UPDATE orderSummary SET totalAmount = (?) WHERE orderId = ?";
             PreparedStatement pstmt3 = con.prepareStatement(updateSQL);
-            pstmt3.setInt(1, orderId);
+            pstmt3.setDouble(1, orderTotal);
             pstmt3.setInt(2, orderId);
             pstmt3.executeUpdate();
             pstmt3.close();
