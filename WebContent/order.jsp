@@ -154,7 +154,7 @@
             pstmt3.executeUpdate();
             pstmt3.close();
 
-            // FINAL STUFF
+            // SUCCESS STUFF
             // get customer name
             customerResultSet.next();
             String customerName = customerResultSet.getString("firstName") + " " + customerResultSet.getString("lastName");
@@ -170,10 +170,12 @@
             );
 
             out.println(successMessage);
+            out.println("<h2><a href=\"shop.html\">Return to home page.</a></h2>");
 
             // Clear cart if order placed successfully
+            session.setAttribute("productList", null);
+            //I don't think there is a need to clear inCart in DB because it doesn't appear to have been used anywhere... but I probably should?
 
-            
         }
 
         
