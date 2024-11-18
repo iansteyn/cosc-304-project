@@ -44,15 +44,15 @@
         }
 
         // Connect to DB and validate customer id (PT 2),
-        getConnection();
-        PreparedStatement pstmt1 = con.prepareStatement(
+        getConnection(); // from jdbc.jsp
+        PreparedStatement customer_pstmt = con.prepareStatement(
             "SELECT firstName, lastName FROM customer WHERE customerId = ?"
         );
         
         int customerId = Integer.parseInt(customerIdString);
-        pstmt1.setInt(1, customerId); 
+        customer_pstmt.setInt(1, customerId); 
 
-        ResultSet customerResultSet = pstmt1.executeQuery();
+        ResultSet customerResultSet = customer_pstmt.executeQuery();
         boolean customerIdIsInDB = customerResultSet.isBeforeFirst();
 
         if (!customerIdIsInDB) {
@@ -61,29 +61,25 @@
             return; //end jsp execution early
         }
 
-        // SAVE INFO TO ORDERSUMMARY
-        // -------------------------
-        // Save customerid and orderdate information to database
-        String insertSQL = "INSERT INTO orderSummary(customerId, orderDate) VALUES(?, ?)";
+        // ORDERSUMMARY STUFF
+        // ------------------
+        // Save customerid and orderdate info to database
+        PreparedStatement orderSummary_pstmt = con.prepareStatement(
+            "INSERT INTO orderSummary(customerId, orderDate) VALUES(?, ?)",
+            Statement.RETURN_GENERATED_KEYS
+        );
+        orderSummary_pstmt.setInt(1, customerId);
+        orderSummary_pstmt.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+        orderSummary_pstmt.executeUpdate();
 
-        PreparedStatement pstmt = con.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);			
-        pstmt.setInt(1, customerId);
-        pstmt.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
-        pstmt.executeUpdate();
-
-        //PREPARE TO SAVE AND PRINT PRODUCTLIST INFO
-        // Prep - Get orderId generated from previous INSERT
-        ResultSet keys = pstmt.getGeneratedKeys();
+        // Get orderId generated from the INSERT
+        ResultSet keys = orderSummary_pstmt.getGeneratedKeys();
         keys.next();
         int orderId = keys.getInt(1);
-        pstmt.close();
 
-        //Prep - prepare a new insert statement
-        String insertSQL2 = "INSERT INTO OrderProduct(OrderId, ProductId, quantity, price) VALUES(?, ?, ?, ?)";
-        PreparedStatement pstmt2 = con.prepareStatement(insertSQL2);
-        pstmt2.setInt(1, orderId);
-
-        //html prep - for some reason multiline strings are not a thing for JSP
+        // PREPARE FOR ORDERPRODUCT STUFF
+        // ------------------------------
+        //set up html table - for some reason multiline strings are not a thing for JSP
         out.println(
             "<h1>Your Order Summary</h1>"
             +"<table style='text-align: center'>"
@@ -96,17 +92,20 @@
             +   "</tr>"
         );
 
-        //prep - initialize orderTotal variable, get currency formatter
+        //Initialize fields needed in the iterator loop
         double orderTotal = 0;
         NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
-        
-        //SAVE AND PRINT PRODUCT LIST INFO
-        //For each item in productList:
-            // - insert it into OrderProduct table, using the orderId
-            // - calculate its subtotal to the order total
-            // - print out its row in the table
+
+        PreparedStatement orderProduct_pstmt = con.prepareStatement(
+            "INSERT INTO OrderProduct(OrderId, ProductId, quantity, price) VALUES(?, ?, ?, ?)"
+        );
+        orderProduct_pstmt.setInt(1, orderId);
+
+        // ORDERPRODUCT STUFF
+        // ------------------
             // Each entry in the HashMap is an ArrayList with item 0-id, 1-name, 2-price, 3-quantity
         Iterator<Map.Entry<String, ArrayList<Object>>> iterator = productList.entrySet().iterator();
+
         while (iterator.hasNext()) {
         
             //Get item info from productList hashmap
@@ -122,16 +121,16 @@
             double price = Double.parseDouble(priceString);
 
             // Insert item record into OrderProduct table
-            pstmt2.setInt(2, productId);
-            pstmt2.setInt(3, quantity);
-            pstmt2.setDouble(4, price);
-            pstmt2.executeUpdate();
+            orderProduct_pstmt.setInt(2, productId);
+            orderProduct_pstmt.setInt(3, quantity);
+            orderProduct_pstmt.setDouble(4, price);
+            orderProduct_pstmt.executeUpdate();
 
-            //Calculate subtotal
+            //Calculate item subtotal
             double subtotal = quantity * price;
             orderTotal += subtotal;
 
-            //Print row
+            //Print item as row in html table
             String tableRow = String.format(
                 "<tr> <td>%d</td> <td>%s</td> <td>%d</td> <td>%s</td> <td>%s</td> </tr>",
                 productId,
@@ -144,9 +143,8 @@
             out.println(tableRow);
         }
 
-        pstmt2.close();
-
         // ORDER TOTAL STUFF
+        // -----------------
         //print orderTotal
         String finalRow = String.format(
             "<tr> <td></td> <td></td> <td></td> <th>Order Total</th> <td>%s</tr>",
@@ -155,15 +153,16 @@
         out.println(finalRow);
         out.println("</table>");
 
-        //Update total amount for order record
-        String updateSQL = "UPDATE orderSummary SET totalAmount = ? WHERE orderId = ?";
-        PreparedStatement pstmt3 = con.prepareStatement(updateSQL);
-        pstmt3.setDouble(1, orderTotal);
-        pstmt3.setInt(2, orderId);
-        pstmt3.executeUpdate();
-        pstmt3.close();
+        //Update total amount for orderSummary record
+        PreparedStatement orderSummary_pstmt2 = con.prepareStatement(
+            "UPDATE orderSummary SET totalAmount = ? WHERE orderId = ?"
+        );
+        orderSummary_pstmt2.setDouble(1, orderTotal);
+        orderSummary_pstmt2.setInt(2, orderId);
+        orderSummary_pstmt2.executeUpdate();
 
-        // SUCCESS STUFF
+        // SUCCESS  STUFF
+        // --------------
         // get customer name
         customerResultSet.next();
         String customerName = customerResultSet.getString("firstName") + " " + customerResultSet.getString("lastName");
@@ -183,16 +182,11 @@
 
         // Clear cart if order placed successfully
         session.setAttribute("productList", null);
-        //Is there a need to clear the relevant rows in the inCart table?? 
-        //The info doesn't appear to have been put in it anywhere...
 
         //close db connection
         closeConnection(); // from jdbc.jsp
-
-        //TODO - rename all pstmts more sensibly.
     %>
 
-    <p>this shouldn't show on the error pages<p> <!--TODO remove-->
 </body>
 </html>
 
