@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>YOUR NAME Grocery Order List</title>
+<title>Rowan & Ian's Grocery Order List</title>
 </head>
 <body>
 
@@ -26,6 +26,38 @@ catch (java.lang.ClassNotFoundException e)
 // out.println(currFormat.format(5.0);  // Prints $5.00
 
 // Make connection
+
+
+String url = "jdbc:sqlserver://cosc304_sqlserver:1433;DatabaseName=orders;TrustServerCertificate=True";		
+String uid = "sa";
+String pw = "304#sa#pw";
+
+String query = "SELECT * FROM order ";
+
+// Make connection to DB
+            try(Connection con = DriverManager.getConnection(url, uid, pw);
+                PreparedStatement preparedStatement = con.prepareStatement(query);)
+            {
+                //do the query
+                //preparedStatement.setString(1, searchTerm);
+                //ResultSet resultSet = preparedStatement.executeQuery();
+
+               // NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
+
+                // Process query results row by row
+                //while (resultSet.next())
+                //{
+                    //int productId = resultSet.getInt("productId");
+                    //String productName = resultSet.getString("productName");
+                    //double productPrice = resultSet.getDouble("productPrice");
+
+                
+
+                   
+
+                    //out.println(tableRow);
+                //}
+            }
 
 // Write query to retrieve all order summary records
 
