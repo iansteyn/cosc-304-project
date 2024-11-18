@@ -43,7 +43,8 @@
             return; //END jsp execution early
         }
 
-        // Connect to DB and validate customer id (PT 2),
+        // Connect to DB and validate customer id (PT 2)
+            // Note: this resultset is later used to print customer name
         getConnection(); // from jdbc.jsp
         PreparedStatement customer_pstmt = con.prepareStatement(
             "SELECT firstName, lastName FROM customer WHERE customerId = ?"
@@ -55,7 +56,7 @@
         ResultSet customerResultSet = customer_pstmt.executeQuery();
         boolean customerIdIsInDB = customerResultSet.isBeforeFirst();
 
-        if (!customerIdIsInDB) {
+        if (! customerIdIsInDB) {
             out.println(invalidIdMessage);
             closeConnection();
             return; //end jsp execution early
@@ -107,7 +108,7 @@
         Iterator<Map.Entry<String, ArrayList<Object>>> iterator = productList.entrySet().iterator();
 
         while (iterator.hasNext()) {
-        
+
             //Get item info from productList hashmap
             Map.Entry<String, ArrayList<Object>> entry = iterator.next();
             ArrayList<Object> product = (ArrayList<Object>) entry.getValue();
@@ -171,7 +172,7 @@
         String successMessage = String.format(
             "<h1>Order Completed. Will be shipped soon...</h1>"
             +"<h2>Your order reference number is: %d</h2>"
-            +"<h2>Shipping to customer: %d. Name: %s",
+            +"<h2>Shipping to customer: %d. Name: %s.",
             orderId,
             customerId,
             customerName
