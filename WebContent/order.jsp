@@ -20,8 +20,8 @@
         @SuppressWarnings({"unchecked"})
         HashMap<String, ArrayList<Object>> productList = (HashMap<String, ArrayList<Object>>) session.getAttribute("productList");
 
-        // VALIDATION
-        // ----------
+        // VALIDATION STUFF
+        // ----------------
         // Create error messages
         String emptyCartMessage = "<h1>Shopping cart is empty!<h1>"
                                 + "<h2><a href=\"listprod.jsp\">Return to shopping.</a></h2>";
@@ -30,7 +30,7 @@
                                 + "<h2><a href=\"checkout.jsp\">Try again.</a></h2>";
 
         // Validate shopping cart
-        if (productList.isEmpty()) { //TODO: this line causes an error when shop page is loaded on its on
+        if (productList == null || productList.isEmpty()) {
             out.println(emptyCartMessage);
             return; //END jsp execution early
         }
@@ -161,7 +161,7 @@
         orderSummary_pstmt2.setInt(2, orderId);
         orderSummary_pstmt2.executeUpdate();
 
-        // SUCCESS  STUFF
+        // SUCCESS STUFF
         // --------------
         // get customer name
         customerResultSet.next();
@@ -180,7 +180,7 @@
         out.println(successMessage);
         out.println("<h2><a href=\"shop.html\">Return to home page.</a></h2>");
 
-        // Clear cart if order placed successfully
+        // Clear shopping cart
         session.setAttribute("productList", null);
 
         //close db connection
@@ -189,4 +189,3 @@
 
 </body>
 </html>
-
