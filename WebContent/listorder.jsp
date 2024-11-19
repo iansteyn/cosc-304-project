@@ -10,7 +10,7 @@
 
 <h1>Order List</h1>
 
-<table border="2">
+<table class="outer" border="2">
     <tr>
         <th>Order Id</th>
         <th>Order Date</th>
@@ -41,7 +41,8 @@ String uid = "sa";
 String pw = "304#sa#pw";
 
 
-String query = "SELECT * FROM ordersummary";
+String query = "SELECT * FROM ordersummary JOIN customer ON ordersummary.customerId = customer.customerId";
+
 
 
 
@@ -51,15 +52,36 @@ String query = "SELECT * FROM ordersummary";
             {
 
                 ResultSet resultSet = preparedStatement.executeQuery();
+                NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
 
                 while (resultSet.next()) 
                 {
                     int orderId = resultSet.getInt("orderId");
                     String orderDate = resultSet.getString("orderDate");
                     int customerId = resultSet.getInt("customerId");
-                    String tableRow = String.format("<tr> <td>%s</td> <td>%s</td> <td>%s</td> <tr>", orderId, orderDate, customerId);
+                    String firstName = resultSet.getString("firstName");
+                    String lastName = resultSet.getString("lastName");
+                    String customerName = firstName + " " + lastName;
+                    double totalAmount = resultSet.getDouble("totalAmount");
+                    String formattedTotalAmount = currencyFormatter.format(totalAmount);
+
+                    String tableRow = String.format("<tr> <td>%s</td> <td>%s</td> <td>%s</td> <td>%s</td> <td>%s</td> <tr>", orderId, orderDate, customerId, customerName, formattedTotalAmount);
 
                     out.println(tableRow);
+
+                    String query2 = "SELECT productId, quantity, price FROM orderproduct WHERE orderId = " + orderId;
+                    PreparedStatement preparedStatement2 = con.prepareStatement(query2);
+                    ResultSet resultSet2 = preparedStatement2.executeQuery();
+
+                    out.println(String.format("<tr align='right'> <td colspan='5'> <table class='inner' border='2'> <tr> <th>Product Id</th> <th>Quantity</th> <th>Price</th> </tr>"));
+
+                    while (resultSet2.next())
+                    {
+                        int productId = resultSet2.getInt("productId");
+
+                        out.println(String.format("<tr> <td>%s</td> </tr>", productId));
+                    }
+                    out.println(String.format("</table> </td> </tr>"));
                 }
 
                 
@@ -92,8 +114,11 @@ String query = "SELECT * FROM ordersummary";
 </html>
 
 <style>
-tr:hover {
+.outer tr:hover {
     background-color: #CCFF00;
+}
+.inner tr:hover {
+    background-color: #FF00CC;
 }
 </style>
 
