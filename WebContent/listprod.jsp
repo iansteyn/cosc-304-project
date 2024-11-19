@@ -85,12 +85,19 @@
                         productPrice
                     );
 
+                    String productLink = String.format(
+                        "<a href=\"product.jsp?id=%s\">%s</a>",
+                        productId,
+                        productName
+                    );
+
                     String formattedPrice = currencyFormatter.format(productPrice);
 
                     String tableRow = String.format(
                         "<tr> <td>%s</td> <td>%s</td> <td>%s</td> </tr>",
                         addToCartLink,
-                        productName,
+                        // change product name to be a link to product page
+                        productLink,
                         formattedPrice
                     );
 
