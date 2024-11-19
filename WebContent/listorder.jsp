@@ -23,40 +23,33 @@ catch (java.lang.ClassNotFoundException e)
 
 // Useful code for formatting currency values:
 // NumberFormat currFormat = NumberFormat.getCurrencyInstance();
-// out.println(currFormat.format(5.0);  // Prints $5.00
+// out.println(currFormat.format(5.0));  // Prints $5.00
 
 // Make connection
 
-
+// some connection information
 String url = "jdbc:sqlserver://cosc304_sqlserver:1433;DatabaseName=orders;TrustServerCertificate=True";		
 String uid = "sa";
 String pw = "304#sa#pw";
 
-String query = "SELECT * FROM order ";
+
+String query = "SELECT * FROM order;";
+
+<table>
 
 // Make connection to DB
             try(Connection con = DriverManager.getConnection(url, uid, pw);
                 PreparedStatement preparedStatement = con.prepareStatement(query);)
             {
-                //do the query
-                //preparedStatement.setString(1, searchTerm);
-                //ResultSet resultSet = preparedStatement.executeQuery();
 
-               // NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
-
-                // Process query results row by row
-                //while (resultSet.next())
-                //{
-                    //int productId = resultSet.getInt("productId");
-                    //String productName = resultSet.getString("productName");
-                    //double productPrice = resultSet.getDouble("productPrice");
+                ResultSet resultSet = preparedStatement.executeQuery();
 
                 
-
-                   
-
-                    //out.println(tableRow);
-                //}
+            }
+            // try with resources closes itself
+            catch (SQLException e)
+            {
+                out.println("SQLException: " + e);
             }
 
 // Write query to retrieve all order summary records
@@ -70,6 +63,8 @@ String query = "SELECT * FROM order ";
 		// Write out product information 
 
 // Close connection
+
+</table>
 %>
 
 </body>
