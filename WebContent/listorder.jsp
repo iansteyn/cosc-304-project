@@ -78,8 +78,11 @@ String query = "SELECT * FROM ordersummary JOIN customer ON ordersummary.custome
                     while (resultSet2.next())
                     {
                         int productId = resultSet2.getInt("productId");
+                        int quantity = resultSet2.getInt("quantity");
+                        double price = resultSet2.getDouble("price");
+                        String formattedPrice = currencyFormatter.format(price);
 
-                        out.println(String.format("<tr> <td>%s</td> </tr>", productId));
+                        out.println(String.format("<tr> <td>%s</td> <td>%s</td> <td>%s</td> </tr>", productId, quantity, formattedPrice));
                     }
                     out.println(String.format("</table> </td> </tr>"));
                 }
@@ -118,7 +121,7 @@ String query = "SELECT * FROM ordersummary JOIN customer ON ordersummary.custome
     background-color: #CCFF00;
 }
 .inner tr:hover {
-    background-color: #FF00CC;
+    background-color: #33DDBB;
 }
 </style>
 
