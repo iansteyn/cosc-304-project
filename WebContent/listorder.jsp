@@ -10,6 +10,15 @@
 
 <h1>Order List</h1>
 
+<table border="2">
+    <tr>
+        <th>Order Id</th>
+        <th>Order Date</th>
+        <th>Customer Id</th>
+        <th>Customer Name</th>
+        <th>Total Amount</th>
+
+
 <%
 //Note: Forces loading of SQL Server driver
 try
@@ -25,7 +34,6 @@ catch (java.lang.ClassNotFoundException e)
 // NumberFormat currFormat = NumberFormat.getCurrencyInstance();
 // out.println(currFormat.format(5.0));  // Prints $5.00
 
-// Make connection
 
 // some connection information
 String url = "jdbc:sqlserver://cosc304_sqlserver:1433;DatabaseName=orders;TrustServerCertificate=True";		
@@ -33,9 +41,9 @@ String uid = "sa";
 String pw = "304#sa#pw";
 
 
-String query = "SELECT * FROM order;";
+String query = "SELECT * FROM ordersummary";
 
-<table>
+
 
 // Make connection to DB
             try(Connection con = DriverManager.getConnection(url, uid, pw);
@@ -43,6 +51,16 @@ String query = "SELECT * FROM order;";
             {
 
                 ResultSet resultSet = preparedStatement.executeQuery();
+
+                while (resultSet.next()) 
+                {
+                    int orderId = resultSet.getInt("orderId");
+                    String orderDate = resultSet.getString("orderDate");
+                    int customerId = resultSet.getInt("customerId");
+                    String tableRow = String.format("<tr> <td>%s</td> <td>%s</td> <td>%s</td> <tr>", orderId, orderDate, customerId);
+
+                    out.println(tableRow);
+                }
 
                 
             }
@@ -64,9 +82,18 @@ String query = "SELECT * FROM order;";
 
 // Close connection
 
-</table>
+
 %>
+</table>
+
+
 
 </body>
 </html>
+
+<style>
+tr:hover {
+    background-color: #CCFF00;
+}
+</style>
 
