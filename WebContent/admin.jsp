@@ -1,3 +1,5 @@
+<%@ page import="java.text.NumberFormat" %>
+<%@ page import="java.time.format.DateTimeFormatter" %>
 <!DOCTYPE html>
 <html>
 
@@ -32,9 +34,10 @@
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd LLLL yyyy"); //eg 03 January 2024
 
             while(rst.next()) {
-                Timestamp orderDate = rst.getTimestamp(orderDate);
-                double summedTotalAmount = rst.getDouble(summedTotalAmount);
+                Timestamp orderDateTime = rst.getTimestamp("orderDate");
+                double summedTotalAmount = rst.getDouble("summedTotalAmount");
 
+                LocalDate orderDate = orderDateTime.toLocalDateTime().toLocalDate();
                 String formattedDate = dateFormatter.format(orderDate);
                 String formattedAmount = currencyFormatter.format(summedTotalAmount);
 
