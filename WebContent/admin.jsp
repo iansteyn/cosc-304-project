@@ -8,7 +8,7 @@
 <body>
 
     <%@ include file="jdbc.jsp" %>
-    <%@ include file="auth.jsp" %>
+    <%-- <%@ include file="auth.jsp" %> --%>
 
     <h1>Administrator Sales Report by Day<h1>
 
@@ -20,7 +20,6 @@
 
         <%
 
-            // TODO: Write SQL query that prints out total order amount by day
             String sql = "SELECT orderDate, SUM(totalAmount) AS summedTotalAmount"
                     + "FROM OrderSummary"
                     + "GROUP BY orderDate";
@@ -30,20 +29,19 @@
             ResultSet rst = stmt.executeQuery(sql);
 
             NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd LLLL yyyy"); //eg 03 January 2024
 
             while(rst.next()) {
                 Timestamp orderDate = rst.getTimestamp(orderDate);
                 double summedTotalAmount = rst.getDouble(summedTotalAmount);
 
-                //TODO: turn date into string
-
-                //TODO: format currency
-                String formattedTotalAmount = 
+                String formattedDate = dateFormatter.format(orderDate);
+                String formattedAmount = currencyFormatter.format(summedTotalAmount);
 
                 String tableRow = String.format(
                     "<tr> <td>%s</td> <td>%s</td> <tr>",
                     formattedDate,
-                    currencyFormatter.format(summedTotalAmount);
+                    formattedAmount
                 );
 
                 out.println(tableRow);
