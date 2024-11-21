@@ -80,6 +80,10 @@ try(Connection con = DriverManager.getConnection(url, uid, pw);
 // TODO: Add links to Add to Cart and Continue Shopping
 %>
 
+<h3><a href="addcart.jsp?id=3&amp;name=Aniseed Syrup&amp;price=10.0">Add to Cart</a>
+
+<a href="listprod.jsp">Continue Shopping</a></h3>
+
 </body>
 </html>
 
