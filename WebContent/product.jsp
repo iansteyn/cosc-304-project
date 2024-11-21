@@ -45,27 +45,31 @@ try(Connection con = DriverManager.getConnection(url, uid, pw);
         ResultSet resultSet = preparedStatement.executeQuery();
         NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
 
-        while (resultSet.next()) {
-            String name = resultSet.getString("productName");
-            int id = resultSet.getInt("productId");
-            double productPrice = resultSet.getDouble("productPrice");
-            String formattedProductPrice = currencyFormatter.format(productPrice);
-            String imageURL = resultSet.getString("productImageURL");
-            String image = String.format("<img style=padding:10; src =%s>", imageURL);
+        resultSet.next();
+        String name = resultSet.getString("productName");
+        int id = resultSet.getInt("productId");
+        double productPrice = resultSet.getDouble("productPrice");
+        String formattedProductPrice = currencyFormatter.format(productPrice);
+        String imageURL = resultSet.getString("productImageURL");
+        String image = String.format("<img style=padding:10; src =%s>", imageURL);
 
-            // String tablerow = String.format("<tr> <td>%s</td>  <td>%d</td> <td>%s</td> <td>%s</td></tr>", image, id, name, formattedProductPrice);
-
-            String output = String.format("<h1>%s</h1>", name);
-            out.println(output);
-            if (imageURL != null) {
-                out.println((image));
-            }
-
-            String table = String.format("<table border='2'> <tr> <th>Product ID</th> <th>Product Price</th> </tr> <tr> <td>%d</td> <td>%s</td> </table>", id, formattedProductPrice);
-            out.println(table);
-
-            
+        String output = String.format("<h1>%s</h1>", name);
+        out.println(output);
+        if (imageURL != null) {
+            out.println((image));
         }
+
+        String table = String.format("<table border='2'> <tr> <th>Product ID</th> <th>Product Price</th> </tr> <tr> <td>%d</td> <td>%s</td> </table>", id, formattedProductPrice);
+        out.println(table);
+
+        out.println("</div> <div class='links'> <h3> <form>");
+
+        String add_cart_link = String.format("addcart.jsp?id=%d&name=%s&price=%f", id, name, productPrice);
+        String thing = (String.format("<button class='button-5' formaction=%s role='button'>Add to Cart</button>", add_cart_link));
+        out.println(thing);
+
+        
+        
     }
         // try with resources closes itself
         catch (SQLException e)
@@ -73,19 +77,8 @@ try(Connection con = DriverManager.getConnection(url, uid, pw);
             out.println("SQLException: " + e);
         }
 
-// TODO: If there is a productImageURL, display using IMG tag
-		
-// TODO: Retrieve any image stored directly in database. Note: Call displayImage.jsp with product id as parameter.
-		
-// TODO: Add links to Add to Cart and Continue Shopping
-%>
 
-</div>
-
-<div class="links">
-    <h3>
-        <form>
-            <button class="button-5" formaction="addcart.jsp?id=3&amp;name=Aniseed Syrup&amp;price=10.0" role="button">Add to Cart</button>
+%>   
         </form>
         <form>
             <button class="button-5" formaction="listprod.jsp" role="button">Continue Shopping</button>
