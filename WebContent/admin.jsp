@@ -1,5 +1,6 @@
 <%@ page import="java.text.NumberFormat" %>
 <%@ page import="java.time.format.DateTimeFormatter" %>
+<%@ page import="java.time.LocalDate" %>
 <!DOCTYPE html>
 <html>
 
@@ -12,37 +13,39 @@
     <%@ include file="jdbc.jsp" %>
     <%-- <%@ include file="auth.jsp" %> --%>
 
-    <h1>Administrator Sales Report by Day<h1>
+    <h1>Administrator Sales Report by Day</h1>
 
     <table>
         <tr>
-            <th>Order Date<th>
-            <th>Total Order Amount<th>
-        <tr>
+            <th>Order Date</th>
+            <th>Total Order Amount</th>
+        </tr>
 
         <%
-
-            String sql = "SELECT orderDate, SUM(totalAmount) AS summedTotalAmount"
-                    + "FROM OrderSummary"
-                    + "GROUP BY orderDate";
+            String sql = "SELECT CAST(orderDate AS DATE) AS dateOnly, SUM(totalAmount) AS summedTotalAmount "
+                       + "FROM OrderSummary "
+                       + "GROUP BY CAST(orderDate AS DATE)";
 
             getConnection();
             Statement stmt = con.createStatement();
             ResultSet rst = stmt.executeQuery(sql);
 
             NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
-            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd LLLL yyyy"); //eg 03 January 2024
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd LLL yyyy"); //eg 03 January 2024
 
             while(rst.next()) {
-                Timestamp orderDateTime = rst.getTimestamp("orderDate");
+                //get the data
+                java.sql.Date sqlOrderDate = rst.getDate("dateOnly");
                 double summedTotalAmount = rst.getDouble("summedTotalAmount");
-
-                LocalDate orderDate = orderDateTime.toLocalDateTime().toLocalDate();
+                
+                //format the data
+                LocalDate orderDate = sqlOrderDate.toLocalDate();
                 String formattedDate = dateFormatter.format(orderDate);
                 String formattedAmount = currencyFormatter.format(summedTotalAmount);
 
+                //print the data
                 String tableRow = String.format(
-                    "<tr> <td>%s</td> <td>%s</td> <tr>",
+                    "<tr> <td>%s</td> <td>%s</td> </tr>",
                     formattedDate,
                     formattedAmount
                 );
@@ -51,11 +54,20 @@
             }
 
             closeConnection();
-
         %>
 
     </table>
 
 </body>
 </html>
+
+<style>
+table, th, td {
+    text-align: center;
+    border: 1px solid black;
+    border-collapse: collapse;
+    padding:5px
+}
+
+</style>
 
