@@ -60,6 +60,8 @@
 
     </table>
 
+    <p><a href="index.jsp">Back to home page.</a></p>
+
 </body>
 </html>
 
