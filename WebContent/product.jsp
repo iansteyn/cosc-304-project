@@ -21,31 +21,40 @@
             String query = "SELECT * FROM product WHERE productId = ?";
             PreparedStatement pstmt = con.prepareStatement(query);
 
-            int productId = request.getParameter("productId");
-            pstmt.setInt(productId);
+            String productIdString = request.getParameter("id");
+            int productId = Integer.parseInt(productIdString);
+            pstmt.setInt(1, productId);
 
             ResultSet rst = pstmt.executeQuery();
 
             // extract product info from the result set
             rst.next();
             String productName = rst.getString("productName");
-            int productId = rst.getInt("productId");
             double productPrice = rst.getDouble("productPrice");
             String imageURL = rst.getString("productImageURL");
             // TODO: get image object directly from resultSet if it exists
 
             closeConnection();
 
-            // format (some) product info
+            // do some formatting
             NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
             String formattedProductPrice = currencyFormatter.format(productPrice);
 
             String image;
-            if (imageUrl == null) {
+            if (imageURL == null) {
                 image = "";
             } else {
                 image = String.format("<img style=padding:10; src=%s>", imageURL);
             }
+
+            String addToCartLink = String.format(
+                "addcart.jsp?id=%d&name=%s&price=%f",
+                productId,
+                productName,
+                productPrice
+            );
+ 
+
         %>
 
         <%-- Display product info --%>
@@ -67,16 +76,6 @@
     <div class='links'>
         <h3>
             <form>
-                <%
-                    String addToCartLink = String.format(
-                        "addcart.jsp?id=%d&name=%s&price=%s",
-                        id,
-                        name,
-                        productPrice
-                    );
-                    // addcart.jsp?id=%d&name=%s&price=%f
-                %>
-                
                 <button class="button-5" formaction="<%= addToCartLink %>" role="button">
                     Add to Cart
                 </button>
