@@ -48,29 +48,46 @@
             }
         %>
 
+        <%-- Display product info --%>
         <h1><%= productName %></h1>
         <%= image %>
 
-        <%
-            String table = String.format("<table border='2'> <tr> <th>Product ID</th> <th>Product Price</th> </tr> <tr> <td>%d</td> <td>%s</td> </table>", id, formattedProductPrice);
-            out.println(table);
+        <table border='2'>
+            <tr>
+                <th>Product ID</th>
+                <th>Product Price</th>
+            </tr>
+            <tr>
+                <td><%= productId %></td>
+                <td><%= formattedProductPrice %></td>
+        </table>
 
-            out.println("</div> <div class='links'> <h3> <form>");
+    </div>
+    
+    <div class='links'>
+        <h3>
+            <form>
+                <%
+                    String addToCartLink = String.format(
+                        "addcart.jsp?id=%d&name=%s&price=%s",
+                        id,
+                        name,
+                        productPrice
+                    );
+                    // addcart.jsp?id=%d&name=%s&price=%f
+                %>
+                
+                <button class="button-5" formaction="<%= addToCartLink %>" role="button">
+                    Add to Cart
+                </button>
+            </form>
 
-            String add_cart_link = String.format("addcart.jsp?id=%d&name=%s&price=%s", id, name, formattedProductPrice);
-            // addcart.jsp?id=%d&name=%s&price=%f
-            String cartButton = String.format("<button class=\"button-5\" formaction=\"%s\" role=\"button\">Add to Cart</button> </form>", add_cart_link);
-            out.println(cartButton);
-
-            
-        %>
-
-        <form>
-            <button class="button-5" formaction="listprod.jsp" role="button">
-                Continue Shopping
-            </button>
-        </form>
-        </h3> <!-- ? -->
+            <form>
+                <button class="button-5" formaction="listprod.jsp" role="button">
+                    Continue Shopping
+                </button>
+            </form>
+        </h3>
     </div>
 
 </body>
