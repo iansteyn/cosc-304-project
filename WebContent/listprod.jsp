@@ -86,7 +86,7 @@
                     );
 
                     String productLink = String.format(
-                        "<a href=\"product.jsp?productId=%d\">%s</a>",
+                        "<a href=\"product.jsp?id=%d\">%s</a>",
                         productId,
                         productName
                     );
