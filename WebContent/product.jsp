@@ -33,6 +33,7 @@
             double productPrice = rst.getDouble("productPrice");
             String imageURL = rst.getString("productImageURL");
             // TODO: get image object directly from resultSet if it exists
+            // TODO: maybe get image description?
 
             closeConnection();
 
@@ -53,8 +54,6 @@
                 productName,
                 productPrice
             );
- 
-
         %>
 
         <%-- Display product info --%>
@@ -74,19 +73,20 @@
     </div>
     
     <div class='links'>
-        <h3>
-            <form>
-                <button class="button-5" formaction="<%= addToCartLink %>" role="button">
+        <p>
+            <a href="<%= addToCartLink %>">
+                <button class="button-5" role="button">
                     Add to Cart
                 </button>
-            </form>
-
-            <form>
-                <button class="button-5" formaction="listprod.jsp" role="button">
+            </a>
+        </p>
+        <p>
+            <a href="listprod.jsp">
+                <button class="button-5" role="button">
                     Continue Shopping
                 </button>
-            </form>
-        </h3>
+            </a>
+        </p>
     </div>
 
 </body>
