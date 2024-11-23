@@ -86,7 +86,7 @@
                     );
 
                     String productLink = String.format(
-                        "<a href=\"product.jsp?id=%s\">%s</a>",
+                        "<a href=\"product.jsp?id=%d\">%s</a>",
                         productId,
                         productName
                     );
@@ -96,7 +96,6 @@
                     String tableRow = String.format(
                         "<tr> <td>%s</td> <td>%s</td> <td>%s</td> </tr>",
                         addToCartLink,
-                        // change product name to be a link to product page
                         productLink,
                         formattedPrice
                     );
