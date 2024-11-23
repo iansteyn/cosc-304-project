@@ -64,9 +64,10 @@ try(Connection con = DriverManager.getConnection(url, uid, pw);
 
         out.println("</div> <div class='links'> <h3> <form>");
 
-        String add_cart_link = String.format("addcart.jsp?id=%d&name=%s&price=%f", id, name, productPrice);
-        String thing = (String.format("<button class='button-5' formaction=%s role='button'>Add to Cart</button>", add_cart_link));
-        out.println(thing);
+        String add_cart_link = String.format("addcart.jsp?id=%d&name=%s&price=%s", id, name, formattedProductPrice);
+        // addcart.jsp?id=%d&name=%s&price=%f
+        String cartButton = String.format("<button class=\"button-5\" formaction=\"%s\" role=\"button\">Add to Cart</button> </form>", add_cart_link);
+        out.println(cartButton);
 
         
         
@@ -79,7 +80,6 @@ try(Connection con = DriverManager.getConnection(url, uid, pw);
 
 
 %>   
-        </form>
         <form>
             <button class="button-5" formaction="listprod.jsp" role="button">Continue Shopping</button>
         </form>
