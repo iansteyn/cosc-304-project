@@ -16,68 +16,53 @@
     <div class="productTable">
 
         <%
-        // Get product name to search for
-        // TODO: Retrieve and display info for the product
-        String productId = request.getParameter("id");
+            // query db for product info using the url parameter 'productId'
+            getConnection();
+            String query = "SELECT * FROM product WHERE productId = ?";
+            PreparedStatement pstmt = con.prepareStatement(query);
 
-        try
-        {	// Load driver class
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-        }
-        catch (java.lang.ClassNotFoundException e)
-        {
-            out.println("ClassNotFoundException: " +e);
-        }
+            int productId = request.getParameter("productId");
+            pstmt.setInt(productId);
 
-        // some connection information
-        String url = "jdbc:sqlserver://cosc304_sqlserver:1433;DatabaseName=orders;TrustServerCertificate=True";		
-        String uid = "sa";
-        String pw = "304#sa#pw";
+            ResultSet rst = pstmt.executeQuery();
 
-        // this is vulnerable to SQL injection attack, fix later
-        String sql = "SELECT * FROM product WHERE productId = " + productId;
+            // extract product info from the result set
+            rst.next();
+            String productName = rst.getString("productName");
+            int productId = rst.getInt("productId");
+            double productPrice = rst.getDouble("productPrice");
+            String imageURL = rst.getString("productImageURL");
+            // TODO: get image object directly from resultSet if it exists
 
+            closeConnection();
 
-        try(Connection con = DriverManager.getConnection(url, uid, pw);
-                PreparedStatement preparedStatement = con.prepareStatement(sql);)
-            {
-                ResultSet resultSet = preparedStatement.executeQuery();
-                NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
+            // format (some) product info
+            NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
+            String formattedProductPrice = currencyFormatter.format(productPrice);
 
-                resultSet.next();
-                String name = resultSet.getString("productName");
-                int id = resultSet.getInt("productId");
-                double productPrice = resultSet.getDouble("productPrice");
-                String formattedProductPrice = currencyFormatter.format(productPrice);
-                String imageURL = resultSet.getString("productImageURL");
-                String image = String.format("<img style=padding:10; src =%s>", imageURL);
-
-                String output = String.format("<h1>%s</h1>", name);
-                out.println(output);
-                if (imageURL != null) {
-                    out.println((image));
-                }
-
-                String table = String.format("<table border='2'> <tr> <th>Product ID</th> <th>Product Price</th> </tr> <tr> <td>%d</td> <td>%s</td> </table>", id, formattedProductPrice);
-                out.println(table);
-
-                out.println("</div> <div class='links'> <h3> <form>");
-
-                String add_cart_link = String.format("addcart.jsp?id=%d&name=%s&price=%s", id, name, formattedProductPrice);
-                // addcart.jsp?id=%d&name=%s&price=%f
-                String cartButton = String.format("<button class=\"button-5\" formaction=\"%s\" role=\"button\">Add to Cart</button> </form>", add_cart_link);
-                out.println(cartButton);
-
-                
-                
+            String image;
+            if (imageUrl == null) {
+                image = "";
+            } else {
+                image = String.format("<img style=padding:10; src=%s>", imageURL);
             }
-                // try with resources closes itself
-                catch (SQLException e)
-                {
-                    out.println("SQLException: " + e);
-                }
+        %>
 
+        <h1><%= productName %></h1>
+        <%= image %>
 
+        <%
+            String table = String.format("<table border='2'> <tr> <th>Product ID</th> <th>Product Price</th> </tr> <tr> <td>%d</td> <td>%s</td> </table>", id, formattedProductPrice);
+            out.println(table);
+
+            out.println("</div> <div class='links'> <h3> <form>");
+
+            String add_cart_link = String.format("addcart.jsp?id=%d&name=%s&price=%s", id, name, formattedProductPrice);
+            // addcart.jsp?id=%d&name=%s&price=%f
+            String cartButton = String.format("<button class=\"button-5\" formaction=\"%s\" role=\"button\">Add to Cart</button> </form>", add_cart_link);
+            out.println(cartButton);
+
+            
         %>
 
         <form>
