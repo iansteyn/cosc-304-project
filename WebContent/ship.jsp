@@ -17,6 +17,8 @@
 
     <%
         // TODO: Get order id
+        String orderIdString = request.getParameter("orderId");
+        int orderId = Integer.parseInt(orderIdString);
             
         // TODO: Check if valid order id in database
         
@@ -30,7 +32,7 @@
         // TODO: Auto-commit should be turned back on
     %>                       				
 
-    <h2><a href="index.html">Back to Main Page</a></h2>
+    <h2><a href="index.jsp">Back to Main Page</a></h2>
 
 </body>
 </html>
