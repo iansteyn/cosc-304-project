@@ -2,7 +2,7 @@
 <%@ page import="java.time.format.DateTimeFormatter" %>
 <%@ page import="java.time.LocalDate" %>
 <%@ include file="jdbc.jsp" %>
-<%@ include file="auth.jsp" %>
+<%@ include file="auth.jsp" %> <%-- checks that user is logged in before accessing page --%>
 <!DOCTYPE html>
 <html>
 
