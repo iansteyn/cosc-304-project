@@ -34,7 +34,7 @@
             String imageURL = rst.getString("productImageURL");
             String productDescription = rst.getString("productDesc");
             // TODO: get image object directly from resultSet if it exists
-            // TODO: maybe get image description?
+            String productImage = rst.getString("productImage");
 
             closeConnection();
 
