@@ -61,7 +61,9 @@
 
             ResultSet orderProduct_rst = orderProduct_pstmt.executeQuery();
 
-            // Create a new shipment record.
+            //TO DO retrieve in a loop
+
+            // Create a new shipment record. - wait shouldn't this go after the check for inventory??
                 // shipmentId gets autoicrmeneted, so no need to specify it
             PreparedStatment ship_pstmt = con.prepareStatement(
                 "INSERT INTO Shipment(shipmentDate, shipmentDesc, warehouseId)\n"
@@ -72,8 +74,28 @@
             ship_pstmt.executeUpdate;
 
             // TODO: For each item verify sufficient quantity available in warehouse 1.
+            Statement inventory_pstmt = con.prepareStatement(
+                "SELECT quantity\n"
+              + "FROM ProductInventory\n"
+              + "WHERE warehouseId = 1 && productId = ?"
+            );
+            inventory_pstmt.setInt(1, productId);
+
+            ResultSet inventory_rst = inventory_stmt.executeQuery();
+            inventory_rst.next();
+            int inventoryQuantity = inventory_rst.getInt("quantity");
+
             // TODO: If any item does not have sufficient inventory, cancel transaction and rollback. Otherwise, update inventory for each item.
-            
+            if (orderedQuantity <= inventoryQuantity) {
+                //print results
+                //TODO: decrement inventory in db??
+            }
+            else {
+                //rollback
+                //print error message
+                //return
+            }
+
             // TODO: Auto-commit should be turned back on
         }
         catch (SQLException ex) {
