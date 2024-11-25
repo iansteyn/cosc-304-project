@@ -33,6 +33,7 @@
 
         try {
             // Check if valid order id in database
+            //TODO - do I need to check if there are products in the order??
             getConnection();
             PreparedStatement validation_pstmt = con.prepareStatement(
                 "SELECT orderId FROM OrderSummary WHERE orderId = ?"
@@ -50,9 +51,16 @@
             // Start a transaction (turn-off auto-commit)
             con.setAutoCommit(false);
 
-            // TODO: Retrieve all items in order with given id
-                //question: does this have to happen once transaction has started? If it's only a query why do transactions matter??
-            //PreparedStatement order_pstmt = 
+            // Retrieve all items in order with given id
+            PreparedStatement orderProduct_pstmt = con.prepareStatement(
+                "SELECT productId, quantity\n"
+              + "FROM OrderProduct\n"
+              + "WHERE orderId = ?"
+            );
+            orderProduct_pstmt.setInt(1, orderId);
+
+            ResultSet orderProduct_rst = orderProduct_pstmt.executeQuery();
+
             // TODO: Create a new shipment record.
             // TODO: For each item verify sufficient quantity available in warehouse 1.
             // TODO: If any item does not have sufficient inventory, cancel transaction and rollback. Otherwise, update inventory for each item.
