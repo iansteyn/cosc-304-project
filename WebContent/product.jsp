@@ -32,6 +32,7 @@
             String productName = rst.getString("productName");
             double productPrice = rst.getDouble("productPrice");
             String imageURL = rst.getString("productImageURL");
+            String productDescription = rst.getString("productDesc");
             // TODO: get image object directly from resultSet if it exists
             // TODO: maybe get image description?
 
@@ -58,7 +59,8 @@
 
         <%-- Display product info --%>
         <h1><%= productName %></h1>
-        <%= image %>
+        <%= image %> <br>
+        <%= productDescription %> <br>
 
         <table border='2'>
             <tr>
