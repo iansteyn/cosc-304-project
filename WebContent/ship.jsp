@@ -44,10 +44,11 @@
 
             if (! orderIdInDatabase) {
                 out.println("<h2>Invalid order id.</h2>");
-                return;
+                return; //end JSP early (`finally` block will still execute)
             }
         
-            // TODO: Start a transaction (turn-off auto-commit)
+            // Start a transaction (turn-off auto-commit)
+            con.setAutoCommit(false);
             
             // TODO: Retrieve all items in order with given id
             // TODO: Create a new shipment record.
