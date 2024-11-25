@@ -34,23 +34,25 @@
         try {
             // Check if valid order id in database
             getConnection();
-            PreparedStatement pstmt = con.prepareStatement(
+            PreparedStatement validation_pstmt = con.prepareStatement(
                 "SELECT orderId FROM OrderSummary WHERE orderId = ?"
             );
-            pstmt.setInt(1, orderId);
-            
-            ResultSet rst = pstmt.executeQuery();
-            boolean orderIdInDatabase = rst.isBeforeFirst();
+            validation_pstmt.setInt(1, orderId);
+
+            ResultSet validation_rst = validation_pstmt.executeQuery();
+            boolean orderIdInDatabase = validation_rst.isBeforeFirst();
 
             if (! orderIdInDatabase) {
                 out.println("<h2>Invalid order id.</h2>");
                 return; //end JSP early (`finally` block will still execute)
             }
-        
+
             // Start a transaction (turn-off auto-commit)
             con.setAutoCommit(false);
-            
+
             // TODO: Retrieve all items in order with given id
+                //question: does this have to happen once transaction has started? If it's only a query why do transactions matter??
+            //PreparedStatement order_pstmt = 
             // TODO: Create a new shipment record.
             // TODO: For each item verify sufficient quantity available in warehouse 1.
             // TODO: If any item does not have sufficient inventory, cancel transaction and rollback. Otherwise, update inventory for each item.
