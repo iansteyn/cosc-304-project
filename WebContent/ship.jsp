@@ -51,7 +51,7 @@
             // Start a transaction (turn-off auto-commit)
             con.setAutoCommit(false);
 
-            // Retrieve all items in order with given id
+            // Retrieve all items in Order with given id
             PreparedStatement orderProduct_pstmt = con.prepareStatement(
                 "SELECT productId, quantity\n"
               + "FROM OrderProduct\n"
@@ -61,7 +61,16 @@
 
             ResultSet orderProduct_rst = orderProduct_pstmt.executeQuery();
 
-            // TODO: Create a new shipment record.
+            // Create a new shipment record.
+                // shipmentId gets autoicrmeneted, so no need to specify it
+            PreparedStatment ship_pstmt = con.prepareStatement(
+                "INSERT INTO Shipment(shipmentDate, shipmentDesc, warehouseId)\n"
+              + "VALUES(?, ?, 1)"
+            );
+            ship_pstmt.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+            ship_pstmt.setString(2, "This shipment contains various items"); //idk what shipmentDesc is supposed to be?
+            ship_pstmt.executeUpdate;
+
             // TODO: For each item verify sufficient quantity available in warehouse 1.
             // TODO: If any item does not have sufficient inventory, cancel transaction and rollback. Otherwise, update inventory for each item.
             
