@@ -16,11 +16,24 @@
 <%@ include file="header.jsp" %>
 
     <%
-        // TODO: Get order id
+        // Get order id
         String orderIdString = request.getParameter("orderId");
         int orderId = Integer.parseInt(orderIdString);
+
+        try {
+            // TODO: Check if valid order id in database
+            getConnection();
+            PreparedStatement pstmt = con.prepareStatement(
+                "SELECT orderId FROM OrderSummary WHERE orderId = ?"
+            );
+            pstmt.setInt(1, orderId);
             
-        // TODO: Check if valid order id in database
+            ResultSet rst = pstmt.executeQuery();
+            boolean orderIdInDatabase = rst.isBeforeFirst();
+
+            if (! orderIdInDatabase) {
+                out.println("<h2>Invalid order id.</h2>");
+            }
         
         // TODO: Start a transaction (turn-off auto-commit)
         
@@ -30,7 +43,14 @@
         // TODO: If any item does not have sufficient inventory, cancel transaction and rollback. Otherwise, update inventory for each item.
         
         // TODO: Auto-commit should be turned back on
-    %>                       				
+        }
+        catch (SQLException ex) {
+            out.println(ex);
+        }
+        finally {
+            closeConnection();
+        }
+    %>
 
     <h2><a href="index.jsp">Back to Main Page</a></h2>
 
