@@ -34,7 +34,7 @@
             String imageURL = rst.getString("productImageURL");
             String productDescription = rst.getString("productDesc");
             // TODO: get image object directly from resultSet if it exists
-            String productImage = rst.getString("productImage");
+            String productImage = rst.get("productImage");
 
             closeConnection();
 
@@ -61,6 +61,8 @@
         <h1><%= productName %></h1>
         <%= image %> <br>
         <%= productDescription %> <br>
+        <%-- Prints a hexadecimal string of 2nd image for id = 1. Not sure how to convert to image --%>
+        <%= productImage %> <br>
 
         <table border='2'>
             <tr>
