@@ -2,19 +2,21 @@
 <%@ include file="jdbc.jsp" %>
 <%
 	String authenticatedUser = null;
-	session = request.getSession(true); //what does this mean
+	session = request.getSession(true);
 
-	try
-	{
+    System.out.println(session);
+	try {
 		authenticatedUser = validateLogin(out,request,session);
 	}
-	catch(IOException e)
-	{	System.err.println(e); }
+	catch(IOException e) {
+        System.err.println(e);
+    }
 
-	if(authenticatedUser != null)
+	if (authenticatedUser != null)
 		response.sendRedirect("index.jsp");		// Successful login
-	else
+	else {
 		response.sendRedirect("login.jsp");		// Failed login - redirect back to login page with a message 
+    }
 %>
 
 
@@ -30,13 +32,14 @@
 		if((username.length() == 0) || (password.length() == 0))
 				return null;
 
-        // TODO: Check if userId and password match some customer account. If so, set retStr to be the username.
+        // Check if userId and password match some customer account.
+        // If so, set retStr to be the username.
 		try 
 		{
 			getConnection();
 
-            String query = "SELECT userid"
-                         + "FROM Customer"
+            String query = "SELECT userid\n"
+                         + "FROM Customer\n"
                          + "WHERE userid = ? AND password = ?";
 
             PreparedStatement pstmt = con.prepareStatement(query);
@@ -46,7 +49,7 @@
             ResultSet rst = pstmt.executeQuery();
             rst.next();
 
-            retStr = rst.getString("username");
+            retStr = rst.getString("userid");
 		} 
 		catch (SQLException ex) {
 			out.println(ex);
