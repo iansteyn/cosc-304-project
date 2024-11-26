@@ -7,6 +7,15 @@
 <%@ page import="java.util.Date" %>
 <%@ include file="jdbc.jsp" %>
 
+<style>
+table, th, td {
+    text-align: center;
+    border: 1px solid black;
+    border-collapse: collapse;
+    padding:5px
+}
+</style>
+
 <html>
 <head>
     <title>Rowan and Ian's Grocery Shipment Processing</title>
@@ -134,8 +143,7 @@
                 }
 
                 // verify sufficient quantity
-                    /* If any item does not have sufficient inventory, cancel transaction and rollback.
-                     * Otherwise, update inventory for each item.*/
+                    /* If any item does not have sufficient inventory, cancel transaction and rollback.*/
                 if (orderedQuantity > inventoryQuantity) {
                     out.println("</table>");
 
@@ -148,6 +156,8 @@
                     con.rollback();
                     return; //end JSP early
                 }
+
+                 /* TODO: Otherwise, update inventory for each item.*/
 
                 // print product info
                 String tableRow = String.format(
@@ -177,11 +187,4 @@
 </body>
 </html>
 
-<style>
-table, th, td {
-    text-align: center;
-    border: 1px solid black;
-    border-collapse: collapse;
-    padding:5px
-}
-</style>
+
