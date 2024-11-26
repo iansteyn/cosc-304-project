@@ -33,8 +33,7 @@
             double productPrice = rst.getDouble("productPrice");
             String imageURL = rst.getString("productImageURL");
             String productDescription = rst.getString("productDesc");
-            // TODO: get image object directly from resultSet if it exists
-            //String productImage = rst.get("productImage");
+            String productImageString = rst.getString("productImage");
 
             closeConnection();
 
@@ -42,11 +41,19 @@
             NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
             String formattedProductPrice = currencyFormatter.format(productPrice);
 
-            String image;
+            String URLImage;
             if (imageURL == null) {
-                image = "";
+                URLImage = "";
             } else {
-                image = String.format("<img style=padding:10; src=%s>", imageURL);
+                URLImage = String.format("<img style=padding:10; src=%s>", imageURL);
+            }
+
+            String productImage;
+            if (productImageString == null || productImageString.isEmpty()) {
+                productImage = "";
+            }
+            else {
+                productImage = String.format("<img src=\"displayImage.jsp?id=%s\">", productId);
             }
 
             String addToCartLink = String.format(
@@ -59,10 +66,10 @@
 
         <%-- Display product info --%>
         <h1><%= productName %></h1>
-        <%= image %> <br>
+        <%= URLImage %>
+        <%= productImage %><br>
         <%= productDescription %> <br>
         <%-- Prints a hexadecimal string of 2nd image for id = 1. Not sure how to convert to image --%>
-        <%-- <%= productImage %> <br> --%>
 
         <table border='2'>
             <tr>
