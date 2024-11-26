@@ -1,10 +1,10 @@
-<!--
+<%--
 A JSP file that encapsulates database connections.
 
 Public methods:
 - public void getConnection() throws SQLException
 - public void closeConnection() throws SQLException  
--->
+--%>
 
 <%@ page import="java.sql.*"%>
 
