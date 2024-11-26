@@ -88,6 +88,7 @@ table, th, td {
     <%----------------------------------%>
     <%
         try {
+            //--- START TRANSACTION ---//
             // Start a transaction (turn-off auto-commit)
             getConnection();
             con.setAutoCommit(false);
@@ -102,25 +103,20 @@ table, th, td {
 
             ResultSet orderProduct_rst = orderProduct_pstmt.executeQuery();
 
-            // Create and commit a new shipment record.
-                /* shipmentId gets autoincremeneted, so no need to specify it */
-            PreparedStatement ship_pstmt = con.prepareStatement(
-                "INSERT INTO Shipment(shipmentDate, shipmentDesc, warehouseId)\n"
-                + "VALUES(?, ?, 1)"
-            );
-            ship_pstmt.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
-            ship_pstmt.setString(2, "This shipment contains various items"); //idk what shipmentDesc is supposed to be?
-            ship_pstmt.executeUpdate();
-            con.commit();
-
-            //prepare statement for product-by-product processing
-            PreparedStatement inventory_pstmt = con.prepareStatement(
+            //prepare statements for product-by-product processing
+            PreparedStatement getInventory_pstmt = con.prepareStatement(
                 "SELECT quantity\n"
-                + "FROM ProductInventory\n"
-                + "WHERE warehouseId = 1 AND productId = ?"
+              + "FROM ProductInventory\n"
+              + "WHERE warehouseId = 1 AND productId = ?"
             );
 
-            //process each product in the order
+            PreparedStatement updateInventory_pstmt = con.prepareStatement(
+                "UPDATE ProductInventory\n"
+              + "SET quantity = ?\n"
+              + "WHERE warehouseId = 1 AND productId = ?"
+            );
+
+            //--- PROCESS EACH PRODUCT IN ORDER ---//
             while(orderProduct_rst.next()) {
 
                 //retrieve product info
@@ -128,15 +124,15 @@ table, th, td {
                 int orderedQuantity = orderProduct_rst.getInt("quantity");
 
                 // Find quantity available in warehouse 1.
-                inventory_pstmt.setInt(1, productId);
-                ResultSet inventory_rst = inventory_pstmt.executeQuery();
+                getInventory_pstmt.setInt(1, productId);
+                ResultSet getInventory_rst = getInventory_pstmt.executeQuery();
 
-                boolean warehouseHasThisProduct = inventory_rst.isBeforeFirst();
+                boolean warehouseHasThisProduct = getInventory_rst.isBeforeFirst();
                 int inventoryQuantity;
 
                 if (warehouseHasThisProduct) {
-                    inventory_rst.next();
-                    inventoryQuantity = inventory_rst.getInt("quantity");
+                    getInventory_rst.next();
+                    inventoryQuantity = getInventory_rst.getInt("quantity");
                 }
                 else {
                     inventoryQuantity = 0;
@@ -157,7 +153,11 @@ table, th, td {
                     return; //end JSP early
                 }
 
-                 /* TODO: Otherwise, update inventory for each item.*/
+                // Update warehouse inventory quantity
+                int newQuantity = inventoryQuantity - orderedQuantity;
+                updateInventory_pstmt.setInt(1, newQuantity);
+                updateInventory_pstmt.setInt(2, productId);
+                updateInventory_pstmt.executeUpdate();
 
                 // print product info
                 String tableRow = String.format(
@@ -165,15 +165,31 @@ table, th, td {
                     productId,
                     orderedQuantity,
                     inventoryQuantity,
-                    inventoryQuantity - orderedQuantity
+                    newQuantity
                 );
 
                 out.println(tableRow);
             }
 
+            //--- END TRANSACTION ---//
+            // Create a new shipment record.
+                /* shipmentId gets autoincremeneted, so no need to specify it */
+            PreparedStatement ship_pstmt = con.prepareStatement(
+                "INSERT INTO Shipment(shipmentDate, shipmentDesc, warehouseId)\n"
+                + "VALUES(?, ?, 1)"
+            );
+            ship_pstmt.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
+            ship_pstmt.setString(2, "This shipment contains various items"); //idk what shipmentDesc is supposed to be?
+            ship_pstmt.executeUpdate();
+
+            // at last, commit the transaction and print success!
+            con.commit();
+
             out.println("</table>");
+            out.println("<h2>Shipment succesfully processed.</h2>");
         }
         catch (SQLException ex) {
+            con.rollback();
             out.println(ex);
         }
         finally {
