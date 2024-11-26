@@ -51,6 +51,18 @@
                 return; //end JSP early (`finally` block will still execute)
             }
 
+            //print table heading
+            out.println(
+                "<h1>Ordered Products in Shipment</h1>"
+                +"<table>"
+                + "<tr>"
+                +   "<th>Product ID</th>"
+                +   "<th>Quantity</th>"
+                +   "<th>Previous Inventory</th>"
+                +   "<th>New Inventory</th>"
+                + "</tr>"
+            );
+
             // Start a transaction (turn-off auto-commit)
             con.setAutoCommit(false);
 
@@ -65,26 +77,14 @@
             ResultSet orderProduct_rst = orderProduct_pstmt.executeQuery();
 
             //prepare some more statements for retrieval
-            Statement inventory_pstmt = con.prepareStatement(
+            PreparedStatement inventory_pstmt = con.prepareStatement(
                 "SELECT quantity\n"
                 + "FROM ProductInventory\n"
-                + "WHERE warehouseId = 1 && productId = ?"
+                + "WHERE warehouseId = 1 AND productId = ?"
             );
 
-            //TO DO retrieve in a loop
+            //process each product in the order
             while(orderProduct_rst.next()) {
-
-                // Create a new shipment record. - wait shouldn't this go after the check for inventory??
-                    // shipmentId gets autoicrmeneted, so no need to specify it
-                PreparedStatment ship_pstmt = con.prepareStatement(
-                    "INSERT INTO Shipment(shipmentDate, shipmentDesc, warehouseId)\n"
-                  + "VALUES(?, ?, 1)"
-                );
-                ship_pstmt.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
-                ship_pstmt.setString(2, "This shipment contains various items"); //idk what shipmentDesc is supposed to be?
-                ship_pstmt.executeUpdate();
-
-                //------------
 
                 //retrieve product info
                 int productId = orderProduct_rst.getInt("productId");
@@ -99,7 +99,17 @@
 
                 // TODO: If any item does not have sufficient inventory, cancel transaction and rollback. Otherwise, update inventory for each item.
                 if (orderedQuantity <= inventoryQuantity) {
-                    //print results
+
+                    String tableRow = String.format(
+                        "<tr> <td>%d</td> <td>%d</td> <td>%d</td> <td>%d</td> </tr>",
+                        productId,
+                        orderedQuantity,
+                        inventoryQuantity,
+                        inventoryQuantity - orderedQuantity
+                    );
+
+                    out.println(tableRow);
+
                     //TODO: decrement inventory in db??
                 }
                 else {
@@ -109,12 +119,23 @@
                 }
             }
 
+            // Create a new shipment record. - this needs to go either before or after while loop, i moved it here
+                    // shipmentId gets autoicrmeneted, so no need to specify it
+                PreparedStatement ship_pstmt = con.prepareStatement(
+                    "INSERT INTO Shipment(shipmentDate, shipmentDesc, warehouseId)\n"
+                  + "VALUES(?, ?, 1)"
+                );
+                ship_pstmt.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
+                ship_pstmt.setString(2, "This shipment contains various items"); //idk what shipmentDesc is supposed to be?
+                ship_pstmt.executeUpdate();
+
             // TODO: Auto-commit should be turned back on
         }
         catch (SQLException ex) {
             out.println(ex);
         }
         finally {
+            out.println("</table>");
             closeConnection();
             out.println(indexPageLink);
         }
