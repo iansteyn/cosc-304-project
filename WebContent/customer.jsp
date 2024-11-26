@@ -15,14 +15,13 @@ boolean loggedIn = (!(userName == null));
 
 if (loggedIn) {
 	getConnection();
-	String sql = "SELECT * FROM CUSTOMER WHERE customerId = ?";
+	String sql = "SELECT * FROM Customer WHERE userId = ?";
 	PreparedStatement pstmt = con.prepareStatement(sql);
-
-	int customerId = Integer.parseInt(userName);
-	pstmt.setInt(1, customerId);
+	pstmt.setString(1, userName);
 
 	ResultSet rst = pstmt.executeQuery();
 	rst.next();
+    String customerId = rst.getString("customerId");
 	String firstName = rst.getString("firstName");
 	String lastName = rst.getString("lastName");
 	String email = rst.getString("email");
@@ -32,7 +31,6 @@ if (loggedIn) {
 	String province = rst.getString("state");
 	String postalCode = rst.getString("postalCode");
 	String country = rst.getString("country");
-	String userid = rst.getString("userid");
 
 	closeConnection();
 	%>
@@ -53,7 +51,7 @@ if (loggedIn) {
 			<td> <%= lastName %> </td>
 		</tr>
 		<tr>
-			<th>email</th>
+			<th>Email</th>
 			<td> <%= email %> </td>
 		</tr>
 		<tr>
@@ -82,11 +80,13 @@ if (loggedIn) {
 		</tr>
 		<tr>
 			<th>User ID</th>
-			<td> <%= userid %> </td>
+			<td> <%= userName %> </td>
 		</tr>
 	</table>
 
-	<% } %>
+<%
+}
+%>
 
 </body>
 </html>
