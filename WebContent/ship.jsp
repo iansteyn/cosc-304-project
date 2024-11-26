@@ -76,6 +76,17 @@
 
             ResultSet orderProduct_rst = orderProduct_pstmt.executeQuery();
 
+            // Create a new shipment record.
+                // shipmentId gets autoicrmeneted, so no need to specify it
+            PreparedStatement ship_pstmt = con.prepareStatement(
+                "INSERT INTO Shipment(shipmentDate, shipmentDesc, warehouseId)\n"
+                + "VALUES(?, ?, 1)"
+            );
+            ship_pstmt.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
+            ship_pstmt.setString(2, "This shipment contains various items"); //idk what shipmentDesc is supposed to be?
+            ship_pstmt.executeUpdate();
+            con.commit();
+
             //prepare some more statements for retrieval
             PreparedStatement inventory_pstmt = con.prepareStatement(
                 "SELECT quantity\n"
@@ -111,24 +122,19 @@
                     out.println(tableRow);
                 }
                 else {
-                    //TODO
-                    //rollback
-                    //print error message
-                    //return
+                    con.rollback();
+
+                    String errorMessage = String.format(
+                        "<h2>Shipment not done. Insufficient inventory for product with ID (%d).</h2>",
+                        productId
+                    );
+                    out.println(errorMessage);
+
+                    return;
                 }
             }
 
             out.println("</table>");
-
-            // Create a new shipment record. - this needs to go either before or after while loop, i moved it here
-                    // shipmentId gets autoicrmeneted, so no need to specify it
-                PreparedStatement ship_pstmt = con.prepareStatement(
-                    "INSERT INTO Shipment(shipmentDate, shipmentDesc, warehouseId)\n"
-                  + "VALUES(?, ?, 1)"
-                );
-                ship_pstmt.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
-                ship_pstmt.setString(2, "This shipment contains various items"); //idk what shipmentDesc is supposed to be?
-                ship_pstmt.executeUpdate();
 
             // Auto-commit should be turned back on
             con.setAutoCommit(true);
