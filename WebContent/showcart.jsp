@@ -75,6 +75,7 @@ else
 	out.println("</table>");
 
 	out.println("<h2><a href=\"checkout.jsp\">Check Out</a></h2>");
+    out.println("<h2><a href=\"clearcart.jsp\">Clear cart</a></h2>");
 }
 %>
 <h2><a href="listprod.jsp">Continue Shopping</a></h2>
