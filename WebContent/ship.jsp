@@ -19,26 +19,29 @@
         String indexPageLink = "<h2><a href=\"index.jsp\">Back to Main Page</a></h2>";
     %>
 
+    <%-- GET AND VALIDATE ORDER ID --%>
+    <%------------------------------%>
     <%
-        // Get order id
         String orderIdString = request.getParameter("orderId");
 
+        // validate that orderId is a number
         if (orderIdString == null || !orderIdString.matches("^[0-9]+$")) {
-            out.println("<h2>Error: Missing or non-integer order id.</h2>");
+            out.println("<h2>Error: Order ID is missing from URL or is not an integer.</h2>");
             out.println(indexPageLink);
             return; //end JSP early
         }
 
         int orderId = Integer.parseInt(orderIdString);
 
-        // Try to ship the order
+        // Check if valid order id in database
         try {
-            // Check if valid order id in database
-                //TODO - do I need to check if there are products in the order??
             getConnection();
+        
+            /* Note: querying from orderProduct rather than orderSummary
+             * verifies that there are actually items in the order. */
             PreparedStatement validation_pstmt = con.prepareStatement(
                 "SELECT orderId\n"
-              + "FROM OrderSummary\n"
+              + "FROM OrderProduct\n"
               + "WHERE orderId = ?"
             );
             validation_pstmt.setInt(1, orderId);
@@ -47,23 +50,37 @@
             boolean orderIdInDatabase = validation_rst.isBeforeFirst();
 
             if (! orderIdInDatabase) {
-                out.println("<h2>Invalid order id.</h2>");
-                return; //end JSP early (`finally` block will still execute)
+                out.println("<h2>Invalid order ID or no items in order.</h2>");
+                out.println(indexPageLink);
+                return; //end JSP early
             }
+        }
+        catch (SQLException ex) {
+            out.println(ex);
+        }
+        finally {
+            closeConnection();
+        }
+    %>
 
-            //print table heading
-            out.println(
-                "<h1>Ordered Products in Shipment</h1>"
-                +"<table>"
-                + "<tr>"
-                +   "<th>Product ID</th>"
-                +   "<th>Quantity</th>"
-                +   "<th>Previous Inventory</th>"
-                +   "<th>New Inventory</th>"
-                + "</tr>"
-            );
+    <%-- PRINT START OF TABLE --%>
+    <%--------------------------%>
+    <h1>Ordered Products in Shipment</h1>
 
+    <table>
+        <tr>
+            <th>Product ID</th>
+            <th>Quantity</th>
+            <th>Previous Inventory</th>
+            <th>New Inventory</th>
+        </tr>
+
+    <%-- ATTEMPT SHIPMENT TRANSACTION --%>
+    <%----------------------------------%>
+    <%
+        try {
             // Start a transaction (turn-off auto-commit)
+            getConnection();
             con.setAutoCommit(false);
 
             // Retrieve all items in Order with given id
@@ -76,8 +93,8 @@
 
             ResultSet orderProduct_rst = orderProduct_pstmt.executeQuery();
 
-            // Create a new shipment record.
-                // shipmentId gets autoicrmeneted, so no need to specify it
+            // Create and commit a new shipment record.
+                /* shipmentId gets autoincremeneted, so no need to specify it */
             PreparedStatement ship_pstmt = con.prepareStatement(
                 "INSERT INTO Shipment(shipmentDate, shipmentDesc, warehouseId)\n"
                 + "VALUES(?, ?, 1)"
@@ -87,7 +104,7 @@
             ship_pstmt.executeUpdate();
             con.commit();
 
-            //prepare some more statements for retrieval
+            //prepare statement for product-by-product processing
             PreparedStatement inventory_pstmt = con.prepareStatement(
                 "SELECT quantity\n"
                 + "FROM ProductInventory\n"
@@ -101,28 +118,18 @@
                 int productId = orderProduct_rst.getInt("productId");
                 int orderedQuantity = orderProduct_rst.getInt("quantity");
 
-                // For each item verify sufficient quantity available in warehouse 1.
+                // Find quantity available in warehouse 1.
                 inventory_pstmt.setInt(1, productId);
                 ResultSet inventory_rst = inventory_pstmt.executeQuery();
                 inventory_rst.next();
 
                 int inventoryQuantity = inventory_rst.getInt("quantity");
 
-                // TODO: If any item does not have sufficient inventory, cancel transaction and rollback. Otherwise, update inventory for each item.
-                if (orderedQuantity <= inventoryQuantity) {
-
-                    String tableRow = String.format(
-                        "<tr> <td><b><i>%d</i></b></td> <td>%d</td> <td>%d</td> <td>%d</td> </tr>",
-                        productId,
-                        orderedQuantity,
-                        inventoryQuantity,
-                        inventoryQuantity - orderedQuantity
-                    );
-
-                    out.println(tableRow);
-                }
-                else {
-                    con.rollback();
+                // verify sufficient quantity
+                    /* If any item does not have sufficient inventory, cancel transaction and rollback.
+                     * Otherwise, update inventory for each item.*/
+                if (orderedQuantity > inventoryQuantity) {
+                    out.println("</table>");
 
                     String errorMessage = String.format(
                         "<h2>Shipment not done. Insufficient inventory for product with ID (%d).</h2>",
@@ -130,20 +137,31 @@
                     );
                     out.println(errorMessage);
 
-                    return;
+                    con.rollback();
+                    return; //end JSP early
                 }
+
+                // print product info
+                String tableRow = String.format(
+                    "<tr> <td><b><i>%d</i></b></td> <td>%d</td> <td>%d</td> <td>%d</td> </tr>",
+                    productId,
+                    orderedQuantity,
+                    inventoryQuantity,
+                    inventoryQuantity - orderedQuantity
+                );
+
+                out.println(tableRow);
             }
 
             out.println("</table>");
-
-            // Auto-commit should be turned back on
-            con.setAutoCommit(true);
         }
         catch (SQLException ex) {
             out.println(ex);
         }
         finally {
+            con.setAutoCommit(true);
             closeConnection();
+
             out.println(indexPageLink);
         }
     %>
