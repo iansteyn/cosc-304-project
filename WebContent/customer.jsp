@@ -84,6 +84,8 @@ if (loggedIn) {
 		</tr>
 	</table>
 
+    <h2><a href="index.jsp">Return to main page</a></h2>
+
 <%
 }
 %>
