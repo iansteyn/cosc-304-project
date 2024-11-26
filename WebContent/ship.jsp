@@ -101,7 +101,7 @@
                 if (orderedQuantity <= inventoryQuantity) {
 
                     String tableRow = String.format(
-                        "<tr> <td>%d</td> <td>%d</td> <td>%d</td> <td>%d</td> </tr>",
+                        "<tr> <td><b><i>%d</i></b></td> <td>%d</td> <td>%d</td> <td>%d</td> </tr>",
                         productId,
                         orderedQuantity,
                         inventoryQuantity,
@@ -143,3 +143,12 @@
 
 </body>
 </html>
+
+<style>
+table, th, td {
+    text-align: center;
+    border: 1px solid black;
+    border-collapse: collapse;
+    padding:5px
+}
+</style>
