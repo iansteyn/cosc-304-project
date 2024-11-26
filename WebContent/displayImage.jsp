@@ -37,7 +37,7 @@ try
 		InputStream istream = rst.getBinaryStream(1);
 		OutputStream ostream = response.getOutputStream();
 
-		int ccount = istream.read(data, 0, BUFFER_SIZE);
+		int count = istream.read(data, 0, BUFFER_SIZE);
 		while ( count != -1) {
 			ostream.write(data, 0, count);
 		}
