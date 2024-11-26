@@ -90,7 +90,7 @@
                 int productId = orderProduct_rst.getInt("productId");
                 int orderedQuantity = orderProduct_rst.getInt("quantity");
 
-                // TODO: For each item verify sufficient quantity available in warehouse 1.
+                // For each item verify sufficient quantity available in warehouse 1.
                 inventory_pstmt.setInt(1, productId);
                 ResultSet inventory_rst = inventory_pstmt.executeQuery();
                 inventory_rst.next();
@@ -109,15 +109,16 @@
                     );
 
                     out.println(tableRow);
-
-                    //TODO: decrement inventory in db??
                 }
                 else {
+                    //TODO
                     //rollback
                     //print error message
                     //return
                 }
             }
+
+            out.println("</table>");
 
             // Create a new shipment record. - this needs to go either before or after while loop, i moved it here
                     // shipmentId gets autoicrmeneted, so no need to specify it
@@ -129,13 +130,13 @@
                 ship_pstmt.setString(2, "This shipment contains various items"); //idk what shipmentDesc is supposed to be?
                 ship_pstmt.executeUpdate();
 
-            // TODO: Auto-commit should be turned back on
+            // Auto-commit should be turned back on
+            con.setAutoCommit(true);
         }
         catch (SQLException ex) {
             out.println(ex);
         }
         finally {
-            out.println("</table>");
             closeConnection();
             out.println(indexPageLink);
         }
