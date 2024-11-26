@@ -121,9 +121,17 @@
                 // Find quantity available in warehouse 1.
                 inventory_pstmt.setInt(1, productId);
                 ResultSet inventory_rst = inventory_pstmt.executeQuery();
-                inventory_rst.next();
 
-                int inventoryQuantity = inventory_rst.getInt("quantity");
+                boolean warehouseHasThisProduct = inventory_rst.isBeforeFirst();
+                int inventoryQuantity;
+
+                if (warehouseHasThisProduct) {
+                    inventory_rst.next();
+                    inventoryQuantity = inventory_rst.getInt("quantity");
+                }
+                else {
+                    inventoryQuantity = 0;
+                }
 
                 // verify sufficient quantity
                     /* If any item does not have sufficient inventory, cancel transaction and rollback.
