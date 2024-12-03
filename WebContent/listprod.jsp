@@ -29,13 +29,18 @@
         (Leave blank for all products)
     </form>
 
-    <%-- GET SEARCH TERM & SET TABLE HEADING --%>
+    <%-- GET FORM INPUTS & SET TABLE HEADING --%>
     <%
         String searchTerm = request.getParameter("productSearch");
+        String category = request.getParameter("categoryName");
 
         if (searchTerm == null) {
             searchTerm = ""; //done so that all products are displayed by default
         }
+        if (category == null) {
+            category = "All"; //done so that all products are displayed by default
+        }
+
 
         String tableHeading;
 
@@ -70,7 +75,14 @@
             String uid = "sa";
             String pw = "304#sa#pw";
 
-            String query = "SELECT productId, productName, productPrice FROM product WHERE productName LIKE '%' + ? + '%'";
+            //prep query
+            String query = "SELECT productId, productName, productPrice\n"
+                         + "FROM product\n"
+                         + "WHERE productName LIKE '%' + ? + '%'";
+
+            if (! category.equals("All")) {
+                query += " AND category = ?";
+            }
 
             // Make connection to DB
             try(Connection con = DriverManager.getConnection(url, uid, pw);
@@ -78,6 +90,9 @@
             {
                 //do the query
                 preparedStatement.setString(1, searchTerm);
+                if (! category.equals("All")) {
+                    preparedStatement.setString(2, category);
+                }
                 ResultSet resultSet = preparedStatement.executeQuery();
 
                 NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
