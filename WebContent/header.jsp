@@ -25,7 +25,7 @@
 
 <style>
     div {
-        background-color: #c8cfff;
+        background-color: #ccff00;
     }
     div.centered-options {
     display: flex;
