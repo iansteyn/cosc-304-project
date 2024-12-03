@@ -12,6 +12,17 @@
     <h1>Search for the products you want to buy:</h1>
 
     <form method="get" action="listprod.jsp">
+        <select size="1" name="categoryName">
+            <option>All</option>
+            <option>Beverages</option>
+            <option>Condiments</option>
+            <option>Confections</option>
+            <option>Dairy Products</option>
+            <option>Grains/Cereals</option>
+            <option>Meat/Poultry</option>
+            <option>Produce</option>
+            <option>Seafood</option>       
+        </select>
         <input type="text" name="productSearch" size="50">
         <input type="submit" value="Submit">
         <input type="reset" value="Reset">
