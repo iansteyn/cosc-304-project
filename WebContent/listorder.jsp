@@ -4,9 +4,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Rowan & Ian's Grocery Order List</title>
+    <title>Puzzle Place Order List</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
+<%@ include file="header.jsp" %>
 
 <h1>Order List</h1>
 

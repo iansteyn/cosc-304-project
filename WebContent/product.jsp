@@ -6,7 +6,7 @@
 <html>
 
 <head>
-    <title>Rowan & Ian's Grocery - Product Information</title>
+    <title>Puzzle Place Product Information</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
 </head>
 

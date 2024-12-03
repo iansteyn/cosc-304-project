@@ -6,8 +6,11 @@
 <html>
 
 <head>
-    <title>Rowan & Ian's Grocery</title>
+    <title>Puzzle Place</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
+
+<%@ include file="header.jsp" %>
 
 <body>
     <h1>Search for the products you want to buy:</h1>

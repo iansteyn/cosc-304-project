@@ -3,11 +3,13 @@
 <%@ page import="java.time.LocalDate" %>
 <%@ include file="jdbc.jsp" %>
 <%@ include file="auth.jsp" %> <%-- checks that user is logged in before accessing page --%>
+<%@ include file="header.jsp" %>
 <!DOCTYPE html>
 <html>
 
 <head>
     <title>Administrator Page</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>

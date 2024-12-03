@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Customer Page</title>
+    <title>Customer Page</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <%@ include file="auth.jsp"%>
 <%@ page import="java.text.NumberFormat" %>
 <%@ include file="jdbc.jsp" %>
+<%@ include file="header.jsp" %>
 
 <%
 String userName = (String) session.getAttribute("authenticatedUser");
