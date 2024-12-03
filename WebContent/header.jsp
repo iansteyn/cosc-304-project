@@ -1,6 +1,6 @@
 
 <div>
-    <h1 align="center"><font face="sans-serif" color="#a8e5ed ">
+    <h1 align="center"><font face="sans-serif">
         <a href="index.jsp">PUZZLE PLACE</a></font>
     </h1>      
     <div class="centered-options">
@@ -25,7 +25,7 @@
 
 <style>
     div {
-        background-color: #dddddd;
+        background-color: #c8cfff;
     }
     div.centered-options {
     display: flex;
