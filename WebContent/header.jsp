@@ -2,7 +2,7 @@
     <H1 align="center"><font face="cursive" color="#3399FF"><a href="index.jsp">Rowan & Ian's Grocery</a></font></H1>      
     <div class="centered-options">
         <p><a href="listprod.jsp">Begin Shopping</a></p>
-        <p>test 2 </p>
+        <p><a href="listorder.jsp">List All Orders</a></p>
         <p>
         <%
         if ((String) session.getAttribute("authenticatedUser") != null) {
@@ -23,7 +23,6 @@
     div.centered-options {
     display: flex;
     margin: auto;
-    padding: 10;
     justify-content: space-evenly;
 }
 
