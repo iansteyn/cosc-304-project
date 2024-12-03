@@ -57,10 +57,50 @@
                 out.println(tableRow);
             }
 
-            closeConnection();
+            
         %>
 
     </table>
+
+    <h1>List of All Customers</h1>
+
+    <table>
+        <tr>
+            <th>Customer ID</th>
+            <th>Customer Information</th>
+        </tr>
+
+        <% 
+            // setup the query and connection
+            String customerquery = "SELECT * FROM customer";
+            getConnection();
+            Statement stmt2 = con.createStatement();
+            ResultSet rsts = stmt2.executeQuery(customerquery);
+
+            while(rsts.next()) {
+                int customerID = rsts.getInt("customerId");
+                String fname = rsts.getString("firstName");
+                String lname = rsts.getString("lastName");
+                String fullname = fname + " " + lname;
+                String email = rsts.getString("email");
+                String phonenum = rsts.getString("phonenum");
+                String country = rsts.getString("country");
+
+                String innerTable = String.format("<table> <tr><td>%s</td></tr> <tr><td>%s</td></tr> <tr><td>%s</td></tr> <tr><td>%s</td></tr> </table>", fullname, email, phonenum, country);
+
+                out.println(String.format("<tr> <td>%d</td> <td>%s</td> </tr>", customerID, innerTable));
+
+
+            }
+            closeConnection();
+        %>
+    </table>
+
+
+
+
+
+
 
     <p><a href="index.jsp">Back to home page.</a></p>
 
