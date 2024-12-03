@@ -32,22 +32,18 @@
     <%-- GET FORM INPUTS & SET TABLE HEADING --%>
     <%
         String searchTerm = request.getParameter("productSearch");
-        String category = request.getParameter("categoryName");
-
-        if (searchTerm == null) {
-            searchTerm = ""; //done so that all products are displayed by default
-        }
-        if (category == null) {
-            category = "All"; //done so that all products are displayed by default
-        }
-
-
         String tableHeading;
-
-        if (searchTerm.equals("")) {
+        if (searchTerm == null || searchTerm.equals("")) {
+            searchTerm = "";
             tableHeading = "All Products";
-        } else {
+        }
+        else {
             tableHeading = String.format("Products containing '%s'", searchTerm);
+        }
+
+        String categoryName = request.getParameter("categoryName");
+        if (categoryName == null) {
+            categoryName = "All";
         }
     %>
 
@@ -80,9 +76,9 @@
                          + "FROM product\n"
                          + "WHERE productName LIKE '%' + ? + '%'";
 
-            if (! category.equals("All")) {
-                query += " AND category = ?";
-            }
+            // if (! category.equals("All")) {
+            //     query += " AND categoryName = ?";
+            // }
 
             // Make connection to DB
             try(Connection con = DriverManager.getConnection(url, uid, pw);
@@ -90,9 +86,9 @@
             {
                 //do the query
                 preparedStatement.setString(1, searchTerm);
-                if (! category.equals("All")) {
-                    preparedStatement.setString(2, category);
-                }
+                // if (! category.equals("All")) {
+                //     preparedStatement.setString(2, category);
+                // }
                 ResultSet resultSet = preparedStatement.executeQuery();
 
                 NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
