@@ -8,6 +8,8 @@
 </head>
 <body>
 
+<%@ include file="header.jsp" %>
+
 <h1>Order List</h1>
 
 <table class="outer" border="2">

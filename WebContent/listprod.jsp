@@ -8,6 +8,8 @@
     <title>Rowan & Ian's Grocery</title>
 </head>
 
+<%@ include file="header.jsp" %>
+
 <body>
     <h1>Search for the products you want to buy:</h1>
 
