@@ -3,10 +3,16 @@
     <div class="centered-options">
         <p>test</p>
         <p>test 2 </p>
+        <p>
         <%
-        if ((String) session.getAttribute("authenticatedUser") != null)
-            out.println("<p>Welcome, " + session.getAttribute("authenticatedUser") + "</p>");
+        if ((String) session.getAttribute("authenticatedUser") != null) {
+            out.println("Welcome, " + session.getAttribute("authenticatedUser") + ". <a href=\"logout.jsp\">Log out</a>");
+        }
+        else {
+            out.println("<a href=\"login.jsp\">Login</a>");
+        }
         %>
+        </p>
     </div>
 </div>
 
