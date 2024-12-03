@@ -1,6 +1,7 @@
 <%@ page import="java.sql.*,java.net.URLEncoder" %>
 <%@ page import="java.text.NumberFormat" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF8"%>
+<%@ include file="jdbc.jsp" %>
 <!DOCTYPE html>
 <html>
 
@@ -58,47 +59,48 @@
 
         <%-- QUERY DB & LIST PRODUCTS IN TABLE --%>
         <%
-            // Load driver class
             try {
-                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            }
-            catch (java.lang.ClassNotFoundException e) {
-                out.println("ClassNotFoundException: " + e);
-            }
+                // Make connection to DB
+                getConnection();
 
-            // Connection info
-            String url = "jdbc:sqlserver://cosc304_sqlserver:1433;DatabaseName=orders;TrustServerCertificate=True";		
-            String uid = "sa";
-            String pw = "304#sa#pw";
+                // Decide how to modify product query based on categoryName
+                String productQueryModifier;
 
-            //prep query
-            String query = "SELECT productId, productName, productPrice\n"
+                if (categoryName.equals("All")) {
+                    productQueryModifier = "";
+                }
+                else {
+                    PreparedStatement category_pstmt = con.prepareStatement(
+                        "SELECT categoryId FROM category WHERE categoryName = ?"
+                    );
+                    category_pstmt.setString(1, categoryName);
+
+                    ResultSet category_rst = category_pstmt.executeQuery();
+                    category_rst.next();
+                    int categoryId = category_rst.getInt("categoryId");
+
+                    productQueryModifier = String.format(" AND categoryId = %d", categoryId);
+                }
+
+                // Query product table
+                PreparedStatement product_pstmt = con.prepareStatement(
+                    "SELECT productId, productName, productPrice\n"
                          + "FROM product\n"
-                         + "WHERE productName LIKE '%' + ? + '%'";
+                         + "WHERE productName LIKE '%' + ? + '%'"
+                         + productQueryModifier
+                );
+                product_pstmt.setString(1, searchTerm);
+                ResultSet product_rst = product_pstmt.executeQuery();
 
-            // if (! category.equals("All")) {
-            //     query += " AND categoryName = ?";
-            // }
-
-            // Make connection to DB
-            try(Connection con = DriverManager.getConnection(url, uid, pw);
-                PreparedStatement preparedStatement = con.prepareStatement(query);)
-            {
-                //do the query
-                preparedStatement.setString(1, searchTerm);
-                // if (! category.equals("All")) {
-                //     preparedStatement.setString(2, category);
-                // }
-                ResultSet resultSet = preparedStatement.executeQuery();
-
+                // prep formatter
                 NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
 
                 // Process query results row by row
-                while (resultSet.next())
+                while (product_rst.next())
                 {
-                    int productId = resultSet.getInt("productId");
-                    String productName = resultSet.getString("productName");
-                    double productPrice = resultSet.getDouble("productPrice");
+                    int productId = product_rst.getInt("productId");
+                    String productName = product_rst.getString("productName");
+                    double productPrice = product_rst.getDouble("productPrice");
 
                     String addToCartLink = String.format(
                         "<a href=\"addcart.jsp?id=%d&name=%s&price=%f\">Add to cart</a>",
@@ -125,10 +127,12 @@
                     out.println(tableRow);
                 }
             }
-            // Note: Connection is closed implicitly
             catch (SQLException e)
             {
                 out.println("SQLException: " + e);
+            }
+            finally {
+                closeConnection();
             }
         %>
     </table>
