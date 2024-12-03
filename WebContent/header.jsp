@@ -1,7 +1,7 @@
 <div>
     <H1 align="center"><font face="cursive" color="#3399FF"><a href="index.jsp">Rowan & Ian's Grocery</a></font></H1>      
     <div class="centered-options">
-        <p>test</p>
+        <p><a href="listprod.jsp">Begin Shopping</a></p>
         <p>test 2 </p>
         <p>
         <%
