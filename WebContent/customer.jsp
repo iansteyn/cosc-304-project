@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Customer Page</title>
+    <title>Customer Page</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 

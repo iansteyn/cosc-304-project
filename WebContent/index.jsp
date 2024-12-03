@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-        <title>Rowan & Ian's Grocery Main Page</title>
-        <link rel="stylesheet" href="css/style.css">
+    <title>Puzzle Place Home</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
  <%@ include file="header.jsp" %>

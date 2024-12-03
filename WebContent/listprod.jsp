@@ -5,7 +5,8 @@
 <html>
 
 <head>
-    <title>Rowan & Ian's Grocery</title>
+    <title>Puzzle Place</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <%@ include file="header.jsp" %>

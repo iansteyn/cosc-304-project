@@ -10,7 +10,8 @@
 <html>
 
 <head>
-    <title>Rowan & Ian's Grocery Order Processing</title>
+    <title>Puzzle Place Order Processing</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>

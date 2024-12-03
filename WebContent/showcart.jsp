@@ -7,7 +7,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Your Shopping Cart</title>
+    <title>Your Shopping Cart</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 

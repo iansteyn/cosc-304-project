@@ -18,7 +18,8 @@ table, th, td {
 
 <html>
 <head>
-    <title>Rowan and Ian's Grocery Shipment Processing</title>
+    <title>Puzzle Place Shipment Processing</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
