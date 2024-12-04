@@ -12,6 +12,8 @@
 </head>
 <body>
 
+<%@ include file="header.jsp" %>
+
 <%
 // Get the current list of products
 @SuppressWarnings({"unchecked"})
@@ -83,3 +85,12 @@ else
 </body>
 </html> 
 
+<style>
+table, th, td {
+    text-align: center;
+    border: 1px solid black;
+    border-collapse: collapse;
+    padding:5px
+}
+
+</style>
