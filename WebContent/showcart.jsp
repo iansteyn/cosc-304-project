@@ -12,6 +12,8 @@
 </head>
 <body>
 
+<%@ include file="header.jsp" %>
+
 <%
 // Get the current list of products
 @SuppressWarnings({"unchecked"})
@@ -67,7 +69,7 @@ else
 		}		
 
 		out.print("<td align=\"right\">"+currFormat.format(pr)+"</td>");
-		out.print("<td align=\"right\">"+currFormat.format(pr*qty)+"</td></tr>");
+		out.print("<td align=\"right\">"+currFormat.format(pr*qty)+"</td>");
 		out.println("</tr>");
 		total = total +pr*qty;
 	}
@@ -83,3 +85,17 @@ else
 </body>
 </html> 
 
+<style>
+td a {
+	color: red;
+}
+table, th, td {
+    text-align: center;
+    border: 1px solid black;
+    border-collapse: collapse;
+    padding:5px
+}
+
+
+
+</style>
