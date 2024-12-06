@@ -7,11 +7,13 @@
 
 <head>
     <title>Puzzle Place Product Information</title>
-    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
+<%@ include file="header.jsp" %>
+
 <body>
-    <%@ include file="header.jsp" %>
+    
 
     <div class="productTable">
 

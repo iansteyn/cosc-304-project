@@ -1,5 +1,5 @@
 
-<div>
+<div class="header">
     <h1 align="center"><font face="sans-serif">
         <a href="index.jsp">PUZZLE PLACE</a></font>
     </h1>      
@@ -24,7 +24,7 @@
 </div>
 
 <style>
-    div {
+    div.header {
         background-color: #ccff00;
     }
     div.centered-options {
